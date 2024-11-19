@@ -65,7 +65,7 @@ class WelcomeWindow(Screen):
 class TehranLineWin(Screen):
     def __init__(self, **kwargs):
         super(TehranLineWin, self).__init__(**kwargs)
-        
+    def on_kv_post(self, base_widget):
         with self.canvas.before:
             self.rect_color = Color(0.4, 0.4, 0.4, 1)
             self.rect = Rectangle()
@@ -120,16 +120,173 @@ class TehranLineWin(Screen):
 class Setting(Screen):
     pass
 class TehranAPIMap(Screen):
-    pass
+    def __init__(self, **kwargs):
+        super(TehranAPIMap, self).__init__(**kwargs)
+    def on_kv_post(self, base_widget):
+        with self.canvas.before:
+            self.rect_color = Color(0.4, 0.4, 0.4, 1)
+            self.rect = Rectangle()
+        
+        self.bind(size=self.update_rect, pos=self.update_rect)
+        
+        self.inside_footer = FloatLayout(pos_hint={'x': 0, 'y': 0}, size_hint=(1, 0.1))
+        self.footer = GridLayout()
+
+        settingBtn = Button(background_normal="icons8-settings-480.png", background_down='icons8-settings-4802.png')
+        apiMapBtn = Button(disabled=True, background_disabled_normal="mapapiicon2.png")
+        mapBtn = Button(background_normal="mapicon.png", background_down='mapicon2.png')
+        navBtn = Button(background_normal="navicon.png", background_down='navicon2.png')
+        lineBtn = Button(background_normal="lineicon.png", background_down='lineicon2.png')
+        
+        self.footer.rows = 1
+        self.footer.cols = 5
+
+        self.footer.add_widget(settingBtn)
+        self.footer.add_widget(apiMapBtn)
+        self.footer.add_widget(lineBtn)
+        self.footer.add_widget(navBtn)
+        self.footer.add_widget(mapBtn)
+        self.inside_footer.add_widget(self.footer)
+        self.add_widget(self.inside_footer)
+
+        mapBtn.bind(on_press=self.map_pressed)
+        lineBtn.bind(on_press=self.line_pressed)
+        navBtn.bind(on_press=self.nav_pressed)
+        settingBtn.bind(on_press=self.setting_pressed)
+
+        inside_header = FloatLayout(pos_hint={'x': 0, 'y': 0.9}, size_hint=(1, 0.1))
+        headerLabel = Label(text=get_display(arabic_reshaper.reshape("نقشه متحرک")), font_size=50, font_name='Vazir-Bold', color="white", pos_hint={'x': 0, 'y': 0})
+        inside_header.add_widget(headerLabel)
+        self.add_widget(inside_header)
+
+    def update_rect(self, *args): 
+        self.rect.pos = (0, self.height * 0.9) # Adjust position to be 90% down the screen 
+        self.rect.size = (self.width, self.height * 0.1)
+
+    def map_pressed(self, instance):
+        sm.current = "tehranmap"
+    def line_pressed(self, instance):
+        sm.current = "tehranline"
+    def nav_pressed(self, instance):
+        sm.current = "tehrannav"
+    def setting_pressed(self, instance):
+        sm.current = "setting"
+
+
 class TehranMap(Screen):
-    pass
+    def __init__(self, **kwargs):
+        super(TehranMap, self).__init__(**kwargs)
+    def on_kv_post(self, base_widget):
+        with self.canvas.before:
+            self.rect_color = Color(0.4, 0.4, 0.4, 1)
+            self.rect = Rectangle()
+        
+        self.bind(size=self.update_rect, pos=self.update_rect)
+        
+        self.inside_footer = FloatLayout(pos_hint={'x': 0, 'y': 0}, size_hint=(1, 0.1))
+        self.footer = GridLayout()
+
+        settingBtn = Button(background_normal="icons8-settings-480.png", background_down='icons8-settings-4802.png')
+        apiMapBtn = Button(background_normal="mapapiicon.png", background_down='mapapiicon2.png')
+        mapBtn = Button(disabled=True, background_disabled_normal="mapicon2.png")
+        navBtn = Button(background_normal="navicon.png", background_down='navicon2.png')
+        lineBtn = Button(background_normal="lineicon.png", background_down='lineicon2.png')
+        
+        self.footer.rows = 1
+        self.footer.cols = 5
+
+        self.footer.add_widget(settingBtn)
+        self.footer.add_widget(apiMapBtn)
+        self.footer.add_widget(lineBtn)
+        self.footer.add_widget(navBtn)
+        self.footer.add_widget(mapBtn)
+        self.inside_footer.add_widget(self.footer)
+        self.add_widget(self.inside_footer)
+
+        apiMapBtn.bind(on_press=self.mapapi_pressed)
+        lineBtn.bind(on_press=self.line_pressed)
+        navBtn.bind(on_press=self.nav_pressed)
+        settingBtn.bind(on_press=self.setting_pressed)
+
+        inside_header = FloatLayout(pos_hint={'x': 0, 'y': 0.9}, size_hint=(1, 0.1))
+        headerLabel = Label(text=get_display(arabic_reshaper.reshape("نقشه رسمی")), font_size=50, font_name='Vazir-Bold', color="white", pos_hint={'x': 0, 'y': 0})
+        inside_header.add_widget(headerLabel)
+        self.add_widget(inside_header)
+
+    def update_rect(self, *args): 
+        self.rect.pos = (0, self.height * 0.9) # Adjust position to be 90% down the screen 
+        self.rect.size = (self.width, self.height * 0.1)
+
+    def mapapi_pressed(self, instance):
+        sm.current = "tehranapimap"
+    def line_pressed(self, instance):
+        sm.current = "tehranline"
+    def nav_pressed(self, instance):
+        sm.current = "tehrannav"
+    def setting_pressed(self, instance):
+        sm.current = "setting"
 class TehranNav(Screen):
-    pass
+    def __init__(self, **kwargs):
+        super(TehranNav, self).__init__(**kwargs)
+    def on_kv_post(self, base_widget):
+        with self.canvas.before:
+            self.rect_color = Color(0.4, 0.4, 0.4, 1)
+            self.rect = Rectangle()
+        
+        self.bind(size=self.update_rect, pos=self.update_rect)
+        
+        self.inside_footer = FloatLayout(pos_hint={'x': 0, 'y': 0}, size_hint=(1, 0.1))
+        self.footer = GridLayout()
+
+        settingBtn = Button(background_normal="icons8-settings-480.png", background_down='icons8-settings-4802.png')
+        apiMapBtn = Button(background_normal="mapapiicon.png", background_down='mapapiicon2.png')
+        mapBtn = Button(background_normal="mapicon.png", background_down='mapicon2.png')
+        navBtn = Button(disabled=True, background_disabled_normal="navicon2.png")
+        lineBtn = Button(background_normal="lineicon.png", background_down='lineicon2.png')
+        
+        self.footer.rows = 1
+        self.footer.cols = 5
+
+        self.footer.add_widget(settingBtn)
+        self.footer.add_widget(apiMapBtn)
+        self.footer.add_widget(lineBtn)
+        self.footer.add_widget(navBtn)
+        self.footer.add_widget(mapBtn)
+        self.inside_footer.add_widget(self.footer)
+        self.add_widget(self.inside_footer)
+
+        apiMapBtn.bind(on_press=self.mapapi_pressed)
+        lineBtn.bind(on_press=self.line_pressed)
+        mapBtn.bind(on_press=self.map_pressed)
+        settingBtn.bind(on_press=self.setting_pressed)
+
+        inside_header = FloatLayout(pos_hint={'x': 0, 'y': 0.9}, size_hint=(1, 0.1))
+        headerLabel = Label(text=get_display(arabic_reshaper.reshape("مسیریاب")), font_size=50, font_name='Vazir-Bold', color="white", pos_hint={'x': 0, 'y': 0})
+        inside_header.add_widget(headerLabel)
+        self.add_widget(inside_header)
+
+    def update_rect(self, *args): 
+        self.rect.pos = (0, self.height * 0.9) # Adjust position to be 90% down the screen 
+        self.rect.size = (self.width, self.height * 0.1)
+
+    def mapapi_pressed(self, instance):
+        sm.current = "tehranapimap"
+    def line_pressed(self, instance):
+        sm.current = "tehranline"
+    def map_pressed(self, instance):
+        sm.current = "tehranmap"
+    def setting_pressed(self, instance):
+        sm.current = "setting"
 class WindowManager(ScreenManager):
     pass
 
-screens = [WelcomeWindow(name="welcome"),TehranLineWin(name="tehranline"),TehranMap(name="tehranmap"),
-           TehranAPIMap(name="tehranapimap"),TehranNav(name="tehrannav"),Setting(name="setting")]
+screens = [ WelcomeWindow(name="welcome"),
+            TehranLineWin(name="tehranline"),
+            TehranMap(name="tehranmap"),
+            TehranAPIMap(name="tehranapimap"),
+            TehranNav(name="tehrannav"), 
+            Setting(name="setting")]
+
 sm = WindowManager()
 for screen in screens:
     sm.add_widget(screen)
