@@ -11,11 +11,22 @@ from kivy.uix.floatlayout import FloatLayout
 from kivy.uix.screenmanager import ScreenManager, Screen
 from kivy.lang import Builder
 from kivy.graphics import *
+from kivy.uix.behaviors import ButtonBehavior
+from kivy.graphics import Ellipse, Color
+from kivy.uix.widget import Widget
+from kivymd.app import MDApp
+from kivymd.uix.button import MDRoundFlatButton
+from kivymd.uix.button import MDIconButton
+from kivymd.uix.button import MDRoundFlatIconButton
+from kivymd.uix.button import BaseButton
+from kivy.graphics import Line
+
 
 kv = Builder.load_file("my.kv")
 Window.clearcolor = (1, 1, 1, 1)
 
 
+        
 class WelcomeWindow(Screen):
     def __init__(self,**kwargs):
         super(WelcomeWindow,self).__init__(**kwargs)
@@ -65,12 +76,66 @@ class WelcomeWindow(Screen):
 class TehranLineWin(Screen):
     def __init__(self, **kwargs):
         super(TehranLineWin, self).__init__(**kwargs)
+        
     def on_kv_post(self, base_widget):
+
         with self.canvas.before:
             self.rect_color = Color(0.4, 0.4, 0.4, 1)
             self.rect = Rectangle()
         
+        with self.canvas:
+            Color(1, 0, 0, 1) 
+            self.line = Line(width=10)
+        with self.canvas:
+            Color(0, 0, 1, 1) 
+            self.line2 = Line(width=10)
+        with self.canvas:
+            Color(0,0.8,1,1) 
+            self.line3 = Line(width=10)
+        with self.canvas:
+            Color(1,0.89,0,1)
+            self.line4 = Line(width=10)
+        with self.canvas:
+            Color(0,0.5,0,1)
+            self.line5 = Line(width=10)
+        with self.canvas:
+            Color(1,0.45,0.85,1)
+            self.line6 = Line(width=10)
+        with self.canvas:
+            Color(0.65,0,1,1)
+            self.line7 = Line(width=10)
+        
+        line1Btn= BaseButton(pos_hint = {'center_x':.5 , 'y':0.8},line_width = 10,line_color=(1,0,0,1),rounded_button=True,md_bg_color=(1,1,1,1))
+        line1Btn.bind(on_press=self.line1_pressed)
+        self.add_widget(line1Btn)
+
+        line2Btn= BaseButton(pos_hint = {'center_x':.5 , 'y':0.6875},line_width = 10,line_color=(0,0,1,1),rounded_button=True,md_bg_color=(1,1,1,1))
+        line2Btn.bind(on_press=self.line1_pressed)
+        self.add_widget(line2Btn)
+
+        line3Btn= BaseButton(pos_hint = {'center_x':.5 , 'y':0.5750},line_width = 10,line_color=(0,0.8,1,1),rounded_button=True,md_bg_color=(1,1,1,1))
+        line3Btn.bind(on_press=self.line1_pressed)
+        self.add_widget(line3Btn)
+
+        line4Btn= BaseButton(pos_hint = {'center_x':.5 , 'y':0.4625},line_width = 10,line_color=(1,0.89,0,1),rounded_button=True,md_bg_color=(1,1,1,1))
+        line4Btn.bind(on_press=self.line1_pressed)
+        self.add_widget(line4Btn)
+
+        line5Btn= BaseButton(pos_hint = {'center_x':.5 , 'y':0.3500},line_width = 10,line_color=(0,0.5,0,1),rounded_button=True,md_bg_color=(1,1,1,1))
+        line5Btn.bind(on_press=self.line1_pressed)
+        self.add_widget(line5Btn)
+
+        line6Btn= BaseButton(pos_hint = {'center_x':.5 , 'y':0.2375},line_width = 10,line_color=(1,0.45,0.85,1),rounded_button=True,md_bg_color=(1,1,1,1))
+        line6Btn.bind(on_press=self.line1_pressed)
+        self.add_widget(line6Btn)
+
+        line7Btn= BaseButton(pos_hint = {'center_x':.5 , 'y':0.1250},line_width = 10,line_color=(0.65,0,1,1),rounded_button=True,md_bg_color=(1,1,1,1))
+        line7Btn.bind(on_press=self.line1_pressed)
+        self.add_widget(line7Btn)
+        
         self.bind(size=self.update_rect, pos=self.update_rect)
+        self.bind(size=self.update_line_position, pos=self.update_line_position) 
+        line1Btn.bind(pos=self.update_line_position)
         
         self.inside_footer = FloatLayout(pos_hint={'x': 0, 'y': 0}, size_hint=(1, 0.1))
         self.footer = GridLayout()
@@ -102,9 +167,24 @@ class TehranLineWin(Screen):
         inside_header.add_widget(headerLabel)
         self.add_widget(inside_header)
 
+        
+        
+        
+
+
     def update_rect(self, *args): 
         self.rect.pos = (0, self.height * 0.9) # Adjust position to be 90% down the screen 
         self.rect.size = (self.width, self.height * 0.1)
+    def update_line_position(self, *args):
+        self.line.points = [self.children[1].center_x, self.children[8].center_y, self.width, self.children[8].center_y]
+        self.line2.points = [self.children[1].center_x, self.children[7].center_y, 0, self.children[7].center_y]
+        self.line3.points = [self.children[1].center_x, self.children[6].center_y, self.width, self.children[6].center_y]
+        self.line4.points = [self.children[1].center_x, self.children[5].center_y, 0, self.children[5].center_y]
+        self.line5.points = [self.children[1].center_x, self.children[4].center_y, self.width, self.children[4].center_y]
+        self.line6.points = [self.children[1].center_x, self.children[3].center_y, 0, self.children[3].center_y]
+        self.line7.points = [self.children[1].center_x, self.children[2].center_y, self.width, self.children[2].center_y]
+        
+        
 
     def map_pressed(self, instance):
         sm.current = "tehranmap"
@@ -114,6 +194,14 @@ class TehranLineWin(Screen):
         sm.current = "tehrannav"
     def setting_pressed(self, instance):
         sm.current = "setting"
+    def line1_pressed(self, instance):
+        print("pr")
+
+        
+
+
+
+    
 
         
 
@@ -280,20 +368,20 @@ class TehranNav(Screen):
 class WindowManager(ScreenManager):
     pass
 
-screens = [ WelcomeWindow(name="welcome"),
+sm = WindowManager()
+
+class MyApp(MDApp):
+    def build(self): 
+        screens = [ WelcomeWindow(name="welcome"),
             TehranLineWin(name="tehranline"),
             TehranMap(name="tehranmap"),
             TehranAPIMap(name="tehranapimap"),
             TehranNav(name="tehrannav"), 
             Setting(name="setting")]
 
-sm = WindowManager()
-for screen in screens:
-    sm.add_widget(screen)
-
-sm.current = "welcome"
-class MyApp (App):
-    def build(self): 
+        for screen in screens:
+            sm.add_widget(screen)
+        sm.current = "welcome"
         return sm
         
         
