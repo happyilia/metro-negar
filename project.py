@@ -1,4 +1,5 @@
 import kivy
+import os
 import arabic_reshaper
 from bidi.algorithm import get_display
 from kivy.app import App
@@ -20,10 +21,15 @@ from kivymd.uix.button import MDIconButton
 from kivymd.uix.button import MDRoundFlatIconButton
 from kivymd.uix.button import BaseButton
 from kivy.graphics import Line
+from kivy.uix.scrollview import ScrollView
 
 
+script_dir = os.path.dirname(os.path.abspath(__file__))
 kv = Builder.load_file("my.kv")
 Window.clearcolor = (1, 1, 1, 1)
+
+def fa(txt):
+    return get_display(arabic_reshaper.reshape(txt))
 
 
         
@@ -137,6 +143,23 @@ class TehranLineWin(Screen):
         self.bind(size=self.update_line_position, pos=self.update_line_position) 
         line1Btn.bind(pos=self.update_line_position)
         
+        j=0
+        for i in (0.8,0.6875,0.5750,0.4625,0.35,0.2375,0.125):
+            j+=1
+            if j%2!=0:
+                xlabel=0.8
+            else:
+                xlabel=0.3
+            file_path = os.path.join(script_dir, "tehran\\line"+str(j)+".txt")
+            linetxt= open(file_path,'r', encoding='utf-8')
+            self.linelabel = Label(text=fa("خط "+str(j)),font_size = 40, font_name='Vazir-Bold' ,color="black",pos_hint = {'center_x':xlabel , 'y':i-0.45})
+            self.add_widget(self.linelabel)
+            taj=linetxt.readlines()[0]+' '
+            linetxt= open(file_path,'r', encoding='utf-8')
+            text=taj+"- "+linetxt.readlines()[len(linetxt.readlines())-1]
+            clean_text = text.replace("\n","")
+            self.linelabel2 = Label(text=fa(clean_text),font_size = 40, font_name='Vazir-Bold' ,color="black",pos_hint = {'center_x':xlabel , 'y':i-0.5})
+            self.add_widget(self.linelabel2)
         self.inside_footer = FloatLayout(pos_hint={'x': 0, 'y': 0}, size_hint=(1, 0.1))
         self.footer = GridLayout()
 
@@ -176,13 +199,14 @@ class TehranLineWin(Screen):
         self.rect.pos = (0, self.height * 0.9) # Adjust position to be 90% down the screen 
         self.rect.size = (self.width, self.height * 0.1)
     def update_line_position(self, *args):
-        self.line.points = [self.children[1].center_x, self.children[8].center_y, self.width, self.children[8].center_y]
-        self.line2.points = [self.children[1].center_x, self.children[7].center_y, 0, self.children[7].center_y]
-        self.line3.points = [self.children[1].center_x, self.children[6].center_y, self.width, self.children[6].center_y]
-        self.line4.points = [self.children[1].center_x, self.children[5].center_y, 0, self.children[5].center_y]
-        self.line5.points = [self.children[1].center_x, self.children[4].center_y, self.width, self.children[4].center_y]
-        self.line6.points = [self.children[1].center_x, self.children[3].center_y, 0, self.children[3].center_y]
-        self.line7.points = [self.children[1].center_x, self.children[2].center_y, self.width, self.children[2].center_y]
+        self.line.points = [self.children[1].center_x, self.children[22].center_y, self.width, self.children[22].center_y]
+        self.line2.points = [self.children[1].center_x, self.children[21].center_y, 0, self.children[21].center_y]
+        self.line3.points = [self.children[1].center_x, self.children[20].center_y, self.width, self.children[20].center_y]
+        self.line4.points = [self.children[1].center_x, self.children[19].center_y, 0, self.children[19].center_y]
+        self.line5.points = [self.children[1].center_x, self.children[18].center_y, self.width, self.children[18].center_y]
+        self.line6.points = [self.children[1].center_x, self.children[17].center_y, 0, self.children[17].center_y]
+        self.line7.points = [self.children[1].center_x, self.children[16].center_y, self.width, self.children[16].center_y]
+        
         
         
 
@@ -195,7 +219,7 @@ class TehranLineWin(Screen):
     def setting_pressed(self, instance):
         sm.current = "setting"
     def line1_pressed(self, instance):
-        print("pr")
+        sm.current="linewin"
 
         
 
@@ -365,6 +389,58 @@ class TehranNav(Screen):
         sm.current = "tehranmap"
     def setting_pressed(self, instance):
         sm.current = "setting"
+
+
+class LineWin(Screen):
+    def __init__(self, **kwargs):
+        super(LineWin, self).__init__(**kwargs)
+        line = open(os.path.join(script_dir, "tehran\\line1.txt"),"r",encoding='utf-8')
+        lines=line.readlines()
+        layoutscroll = GridLayout(cols=1, spacing=100, size_hint_y=None)
+        layoutscroll.bind(minimum_height=layoutscroll.setter('height'))
+        inside_header = FloatLayout(pos_hint={'x': 0, 'y': 0.9}, size_hint=(1, 0.1))
+        headerLabel = Label(text=get_display(arabic_reshaper.reshape("خط 1")), font_size=50, font_name='Vazir-Bold', color="white", pos_hint={'x': 0, 'y': 0})
+        inside_header.add_widget(headerLabel)
+        self.add_widget(inside_header)
+        root = ScrollView(
+         size_hint=(1, 0.9)
+        )
+        with root.canvas.before:
+            Color(1, 0, 0, 1)
+            self.line = Line(points=[Window.width / 2, 0, Window.width / 2, layoutscroll.height],width=10)
+
+        with self.canvas.before:
+            self.rect_color = Color(1,0,0, 1)
+            self.rect = Rectangle()
+        
+        self.bind(size=self.update_rect, pos=self.update_rect)
+        for i in lines:
+            StationBtn= BaseButton(line_width = 10,line_color=(1,0,0,1),rounded_button=True,md_bg_color=(1,1,1,1),pos_hint={"x":0.5})
+            
+            label = Label(text=get_display(arabic_reshaper.reshape(i)), size_hint=(None, None),color="black",font_name="Vazir",font_size=47)
+            float_layout = FloatLayout(size_hint_y=None, height=StationBtn.height) 
+            if lines.index(i)%2==0:
+                xlabel=0.7
+            else:
+                xlabel=0.2
+            StationBtn.pos_hint = {'center_x': 0.5, 'center_y': 0.5} # Position button to the left
+            label.pos_hint = {'x': xlabel, 'center_y': 0.1 }
+            float_layout.add_widget(StationBtn)
+            float_layout.add_widget(label)
+            layoutscroll.add_widget(float_layout)
+        layoutscroll.bind(minimum_height=self.update_line)
+        self.bind(size=self.update_line_position)
+        root.add_widget(layoutscroll)
+        self.add_widget(root)
+    def update_rect(self, *args): 
+        self.rect.pos = (0, self.height * 0.9) # Adjust position to be 90% down the screen 
+        self.rect.size = (self.width, self.height * 0.1)
+    def update_line(self, instance, value):
+        self.line.points = [Window.width / 2, 0, Window.width / 2, instance.height]
+    def update_line_position(self, *args):
+        self.line.points = [self.width / 2, 0, self.width / 2, self.line.points[3]]
+
+
 class WindowManager(ScreenManager):
     pass
 
@@ -377,7 +453,8 @@ class MyApp(MDApp):
             TehranMap(name="tehranmap"),
             TehranAPIMap(name="tehranapimap"),
             TehranNav(name="tehrannav"), 
-            Setting(name="setting")]
+            Setting(name="setting"),
+            LineWin(name="linewin")]
 
         for screen in screens:
             sm.add_widget(screen)
