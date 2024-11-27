@@ -45,30 +45,30 @@ class WelcomeWindow(Screen):
         self.insidebtn.cols = 3
         self.insidebtn.rows = 2
 
-        self.inside.add_widget(Label(text=get_display(arabic_reshaper.reshape("خوش آمدید! ")),font_size = 50, font_name='Vazir-Bold' ,color="black"))
-        self.inside.add_widget(Label(text=get_display(arabic_reshaper.reshape("لطفا شهر خود را انتخاب کنید: ")),font_size = 40, font_name='Vazir',color="black") )
+        self.inside.add_widget(Label(text=fa("خوش آمدید! "),font_size = 50, font_name='Vazir-Bold' ,color="black"))
+        self.inside.add_widget(Label(text=fa("لطفا شهر خود را انتخاب کنید: "),font_size = 40, font_name='Vazir',color="black") )
 
-        self.tehran_btn = Button(text=get_display(arabic_reshaper.reshape('تهران')), font_size=40,font_name='Vazir',background_color="red")
+        self.tehran_btn = Button(text=fa('تهران'), font_size=40,font_name='Vazir',background_color="red")
         self.tehran_btn.bind(on_press=self.pressedtbtn)
         self.insidebtn.add_widget(self.tehran_btn)
 
-        self.mashhad_btn = Button(text=get_display(arabic_reshaper.reshape('مشهد')), font_size=40,font_name='Vazir',background_color="green")
+        self.mashhad_btn = Button(text=fa('مشهد'), font_size=40,font_name='Vazir',background_color="green")
         self.mashhad_btn.bind(on_press=self.pressed)
         self.insidebtn.add_widget(self.mashhad_btn)
 
-        self.isfahan_btn = Button(text=get_display(arabic_reshaper.reshape('اصفهان')), font_size=40,font_name='Vazir',background_color="yellow")
+        self.isfahan_btn = Button(text=fa('اصفهان'), font_size=40,font_name='Vazir',background_color="yellow")
         self.isfahan_btn.bind(on_press=self.pressed)
         self.insidebtn.add_widget(self.isfahan_btn)
 
-        self.shiraz_btn = Button(text=get_display(arabic_reshaper.reshape('شیراز')), font_size=40,font_name='Vazir',background_color="blue")
+        self.shiraz_btn = Button(text=fa('شیراز'), font_size=40,font_name='Vazir',background_color="blue")
         self.shiraz_btn.bind(on_press=self.pressed)
         self.insidebtn.add_widget(self.shiraz_btn)
 
-        self.tabriz_btn = Button(text=get_display(arabic_reshaper.reshape('تبریز')), font_size=40,font_name='Vazir',background_color="pink")
+        self.tabriz_btn = Button(text=fa('تبریز'), font_size=40,font_name='Vazir',background_color="pink")
         self.tabriz_btn.bind(on_press=self.pressed)
         self.insidebtn.add_widget(self.tabriz_btn)
 
-        self.karaj_btn = Button(text=get_display(arabic_reshaper.reshape('کرج')), font_size=40,font_name='Vazir',background_color="gray")
+        self.karaj_btn = Button(text=fa('کرج'), font_size=40,font_name='Vazir',background_color="gray")
         self.karaj_btn.bind(on_press=self.pressed)
         self.insidebtn.add_widget(self.karaj_btn)
 
@@ -186,7 +186,7 @@ class TehranLineWin(Screen):
         settingBtn.bind(on_press=self.setting_pressed)
 
         inside_header = FloatLayout(pos_hint={'x': 0, 'y': 0.9}, size_hint=(1, 0.1))
-        headerLabel = Label(text=get_display(arabic_reshaper.reshape("فهرست خطوط")), font_size=50, font_name='Vazir-Bold', color="white", pos_hint={'x': 0, 'y': 0})
+        headerLabel = Label(text=fa("فهرست خطوط"), font_size=50, font_name='Vazir-Bold', color="white", pos_hint={'x': 0, 'y': 0})
         inside_header.add_widget(headerLabel)
         self.add_widget(inside_header)
 
@@ -267,7 +267,7 @@ class TehranAPIMap(Screen):
         settingBtn.bind(on_press=self.setting_pressed)
 
         inside_header = FloatLayout(pos_hint={'x': 0, 'y': 0.9}, size_hint=(1, 0.1))
-        headerLabel = Label(text=get_display(arabic_reshaper.reshape("نقشه متحرک")), font_size=50, font_name='Vazir-Bold', color="white", pos_hint={'x': 0, 'y': 0})
+        headerLabel = Label(text=fa("نقشه متحرک"), font_size=50, font_name='Vazir-Bold', color="white", pos_hint={'x': 0, 'y': 0})
         inside_header.add_widget(headerLabel)
         self.add_widget(inside_header)
 
@@ -321,7 +321,7 @@ class TehranMap(Screen):
         settingBtn.bind(on_press=self.setting_pressed)
 
         inside_header = FloatLayout(pos_hint={'x': 0, 'y': 0.9}, size_hint=(1, 0.1))
-        headerLabel = Label(text=get_display(arabic_reshaper.reshape("نقشه رسمی")), font_size=50, font_name='Vazir-Bold', color="white", pos_hint={'x': 0, 'y': 0})
+        headerLabel = Label(text=fa("نقشه رسمی"), font_size=50, font_name='Vazir-Bold', color="white", pos_hint={'x': 0, 'y': 0})
         inside_header.add_widget(headerLabel)
         self.add_widget(inside_header)
 
@@ -373,7 +373,7 @@ class TehranNav(Screen):
         settingBtn.bind(on_press=self.setting_pressed)
 
         inside_header = FloatLayout(pos_hint={'x': 0, 'y': 0.9}, size_hint=(1, 0.1))
-        headerLabel = Label(text=get_display(arabic_reshaper.reshape("مسیریاب")), font_size=50, font_name='Vazir-Bold', color="white", pos_hint={'x': 0, 'y': 0})
+        headerLabel = Label(text=fa("مسیریاب"), font_size=50, font_name='Vazir-Bold', color="white", pos_hint={'x': 0, 'y': 0})
         inside_header.add_widget(headerLabel)
         self.add_widget(inside_header)
 
@@ -399,7 +399,7 @@ class LineWin(Screen):
         layoutscroll = GridLayout(cols=1, spacing=100, size_hint_y=None)
         layoutscroll.bind(minimum_height=layoutscroll.setter('height'))
         inside_header = FloatLayout(pos_hint={'x': 0, 'y': 0.9}, size_hint=(1, 0.1))
-        headerLabel = Label(text=get_display(arabic_reshaper.reshape("خط 1")), font_size=50, font_name='Vazir-Bold', color="white", pos_hint={'x': 0, 'y': 0})
+        headerLabel = Label(text=fa("خط 1"), font_size=50, font_name='Vazir-Bold', color="white", pos_hint={'x': 0, 'y': 0})
         inside_header.add_widget(headerLabel)
         self.add_widget(inside_header)
         root = ScrollView(
@@ -417,7 +417,7 @@ class LineWin(Screen):
         for i in lines:
             StationBtn= BaseButton(line_width = 10,line_color=(1,0,0,1),rounded_button=True,md_bg_color=(1,1,1,1),pos_hint={"x":0.5})
             
-            label = Label(text=get_display(arabic_reshaper.reshape(i)), size_hint=(None, None),color="black",font_name="Vazir",font_size=47)
+            label = Label(text=fa(i), size_hint=(None, None),color="black",font_name="Vazir",font_size=47)
             float_layout = FloatLayout(size_hint_y=None, height=StationBtn.height) 
             if lines.index(i)%2==0:
                 xlabel=0.7
