@@ -1,27 +1,4 @@
-import kivy
-import os
-import arabic_reshaper
-from bidi.algorithm import get_display
-from kivy.app import App
-from kivy.uix.label import Label
-from kivy.uix.gridlayout import GridLayout 
-from kivy.uix.textinput import TextInput
-from kivy.uix.button import Button
-from kivy.core.window import Window
-from kivy.uix.floatlayout import FloatLayout
-from kivy.uix.screenmanager import ScreenManager, Screen
-from kivy.lang import Builder
-from kivy.graphics import *
-from kivy.uix.behaviors import ButtonBehavior
-from kivy.graphics import Ellipse, Color
-from kivy.uix.widget import Widget
-from kivymd.app import MDApp
-from kivymd.uix.button import MDRoundFlatButton
-from kivymd.uix.button import MDIconButton
-from kivymd.uix.button import MDRoundFlatIconButton
-from kivymd.uix.button import BaseButton
-from kivy.graphics import Line
-from kivy.uix.scrollview import ScrollView
+from imports import *
 
 
 script_dir = os.path.dirname(os.path.abspath(__file__))
@@ -79,9 +56,10 @@ class WelcomeWindow(Screen):
         sm.current = "tehranline"
     def pressed(self, intance):
         print("pressed")
-class TehranLineWin(Screen):
+
+class TehranLinesWin(Screen):
     def __init__(self, **kwargs):
-        super(TehranLineWin, self).__init__(**kwargs)
+        super(TehranLinesWin, self).__init__(**kwargs)
         
     def on_kv_post(self, base_widget):
 
@@ -221,16 +199,9 @@ class TehranLineWin(Screen):
     def line1_pressed(self, instance):
         sm.current="linewin"
 
-        
-
-
-
-    
-
-        
-
 class Setting(Screen):
     pass
+
 class TehranAPIMap(Screen):
     def __init__(self, **kwargs):
         super(TehranAPIMap, self).__init__(**kwargs)
@@ -284,7 +255,6 @@ class TehranAPIMap(Screen):
     def setting_pressed(self, instance):
         sm.current = "setting"
 
-
 class TehranMap(Screen):
     def __init__(self, **kwargs):
         super(TehranMap, self).__init__(**kwargs)
@@ -337,6 +307,7 @@ class TehranMap(Screen):
         sm.current = "tehrannav"
     def setting_pressed(self, instance):
         sm.current = "setting"
+
 class TehranNav(Screen):
     def __init__(self, **kwargs):
         super(TehranNav, self).__init__(**kwargs)
@@ -394,7 +365,7 @@ class TehranNav(Screen):
 class LineWin(Screen):
     def __init__(self, **kwargs):
         super(LineWin, self).__init__(**kwargs)
-        line = open(os.path.join(script_dir, "tehran\\line1.txt"),"r",encoding='utf-8')
+        line = open(os.path.join(script_dir, direc),"r",encoding='utf-8')
         lines=line.readlines()
         layoutscroll = GridLayout(cols=1, spacing=100, size_hint_y=None)
         layoutscroll.bind(minimum_height=layoutscroll.setter('height'))
@@ -449,12 +420,15 @@ sm = WindowManager()
 class MyApp(MDApp):
     def build(self): 
         screens = [ WelcomeWindow(name="welcome"),
-            TehranLineWin(name="tehranline"),
+            TehranLinesWin(name="tehranline"),
             TehranMap(name="tehranmap"),
             TehranAPIMap(name="tehranapimap"),
             TehranNav(name="tehrannav"), 
-            Setting(name="setting"),
-            LineWin(name="linewin")]
+            Setting(name="setting")]
+        j=0
+        for i in ("tehran\\line1.txt","tehran\\line1.txt","tehran\\line1.txt","tehran\\line1.txt","tehran\\line1.txt","tehran\\line1.txt","tehran\\line1.txt"):
+            j+=1
+            screens.append(LineWin(name="tehranline"+str(j)+"win",direc=i))
 
         for screen in screens:
             sm.add_widget(screen)
