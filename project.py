@@ -56,10 +56,9 @@ class WelcomeWindow(Screen):
         sm.current = "tehranline"
     def pressed(self, intance):
         print("pressed")
-
-class TehranLinesWin(Screen):
+class TehranLineWin(Screen):
     def __init__(self, **kwargs):
-        super(TehranLinesWin, self).__init__(**kwargs)
+        super(TehranLineWin, self).__init__(**kwargs)
         
     def on_kv_post(self, base_widget):
 
@@ -94,27 +93,27 @@ class TehranLinesWin(Screen):
         self.add_widget(line1Btn)
 
         line2Btn= BaseButton(pos_hint = {'center_x':.5 , 'y':0.6875},line_width = 10,line_color=(0,0,1,1),rounded_button=True,md_bg_color=(1,1,1,1))
-        line2Btn.bind(on_press=self.line1_pressed)
+        line2Btn.bind(on_press=self.line2_pressed)
         self.add_widget(line2Btn)
 
         line3Btn= BaseButton(pos_hint = {'center_x':.5 , 'y':0.5750},line_width = 10,line_color=(0,0.8,1,1),rounded_button=True,md_bg_color=(1,1,1,1))
-        line3Btn.bind(on_press=self.line1_pressed)
+        line3Btn.bind(on_press=self.line3_pressed)
         self.add_widget(line3Btn)
 
         line4Btn= BaseButton(pos_hint = {'center_x':.5 , 'y':0.4625},line_width = 10,line_color=(1,0.89,0,1),rounded_button=True,md_bg_color=(1,1,1,1))
-        line4Btn.bind(on_press=self.line1_pressed)
+        line4Btn.bind(on_press=self.line4_pressed)
         self.add_widget(line4Btn)
 
         line5Btn= BaseButton(pos_hint = {'center_x':.5 , 'y':0.3500},line_width = 10,line_color=(0,0.5,0,1),rounded_button=True,md_bg_color=(1,1,1,1))
-        line5Btn.bind(on_press=self.line1_pressed)
+        line5Btn.bind(on_press=self.line5_pressed)
         self.add_widget(line5Btn)
 
         line6Btn= BaseButton(pos_hint = {'center_x':.5 , 'y':0.2375},line_width = 10,line_color=(1,0.45,0.85,1),rounded_button=True,md_bg_color=(1,1,1,1))
-        line6Btn.bind(on_press=self.line1_pressed)
+        line6Btn.bind(on_press=self.line6_pressed)
         self.add_widget(line6Btn)
 
         line7Btn= BaseButton(pos_hint = {'center_x':.5 , 'y':0.1250},line_width = 10,line_color=(0.65,0,1,1),rounded_button=True,md_bg_color=(1,1,1,1))
-        line7Btn.bind(on_press=self.line1_pressed)
+        line7Btn.bind(on_press=self.line7_pressed)
         self.add_widget(line7Btn)
         
         self.bind(size=self.update_rect, pos=self.update_rect)
@@ -197,11 +196,33 @@ class TehranLinesWin(Screen):
     def setting_pressed(self, instance):
         sm.current = "setting"
     def line1_pressed(self, instance):
-        sm.current="linewin"
+        sm.current="tehline1"
+    def line2_pressed(self, instance):
+        sm.current="tehline2"
+    def line3_pressed(self, instance):
+        sm.current="tehline3"
+
+    def line4_pressed(self, instance):
+        sm.current="tehline4"
+    def line5_pressed(self, instance):
+        sm.current="tehline5"
+
+    def line6_pressed(self, instance):
+        sm.current="tehline6"
+    def line7_pressed(self, instance):
+        sm.current="tehline7"
+
+
+        
+
+
+
+    
+
+        
 
 class Setting(Screen):
     pass
-
 class TehranAPIMap(Screen):
     def __init__(self, **kwargs):
         super(TehranAPIMap, self).__init__(**kwargs)
@@ -255,6 +276,7 @@ class TehranAPIMap(Screen):
     def setting_pressed(self, instance):
         sm.current = "setting"
 
+
 class TehranMap(Screen):
     def __init__(self, **kwargs):
         super(TehranMap, self).__init__(**kwargs)
@@ -307,7 +329,6 @@ class TehranMap(Screen):
         sm.current = "tehrannav"
     def setting_pressed(self, instance):
         sm.current = "setting"
-
 class TehranNav(Screen):
     def __init__(self, **kwargs):
         super(TehranNav, self).__init__(**kwargs)
@@ -363,77 +384,181 @@ class TehranNav(Screen):
 
 
 class LineWin(Screen):
-    def __init__(self, **kwargs):
+    def __init__(self, esm,adad,rang, **kwargs):
         super(LineWin, self).__init__(**kwargs)
-        line = open(os.path.join(script_dir, direc),"r",encoding='utf-8')
-        lines=line.readlines()
-        layoutscroll = GridLayout(cols=1, spacing=100, size_hint_y=None)
+        self.esm = esm
+        self.adad = adad
+        self.rang = rang
+        
+        
+        # Ensure 'esm' is passed correctly and used to open the file
+        line = open(os.path.join(script_dir, self.esm), "r", encoding='utf-8')
+        lines = line.readlines()
+        layoutscroll = GridLayout(cols=1, spacing=70, size_hint_y=None)
         layoutscroll.bind(minimum_height=layoutscroll.setter('height'))
-        inside_header = FloatLayout(pos_hint={'x': 0, 'y': 0.9}, size_hint=(1, 0.1))
-        headerLabel = Label(text=fa("خط 1"), font_size=50, font_name='Vazir-Bold', color="white", pos_hint={'x': 0, 'y': 0})
-        inside_header.add_widget(headerLabel)
-        self.add_widget(inside_header)
-        root = ScrollView(
-         size_hint=(1, 0.9)
-        )
+
+        root = ScrollView(size_hint=(1, None), size=(Window.width, Window.height * 0.885))
+
+        # Draw the red line on the canvas
         with root.canvas.before:
-            Color(1, 0, 0, 1)
+            Color( *self.rang)
             self.line = Line(points=[Window.width / 2, 0, Window.width / 2, layoutscroll.height],width=10)
 
         with self.canvas.before:
-            self.rect_color = Color(1,0,0, 1)
+            self.rect_color = Color(*self.rang)
             self.rect = Rectangle()
         
         self.bind(size=self.update_rect, pos=self.update_rect)
+        StationBtns=[]
         for i in lines:
-            StationBtn= BaseButton(line_width = 10,line_color=(1,0,0,1),rounded_button=True,md_bg_color=(1,1,1,1),pos_hint={"x":0.5})
-            
-            label = Label(text=fa(i), size_hint=(None, None),color="black",font_name="Vazir",font_size=47)
-            float_layout = FloatLayout(size_hint_y=None, height=StationBtn.height) 
-            if lines.index(i)%2==0:
-                xlabel=0.7
+            StationBtns.append( BaseButton(line_width = 10,line_color=self.rang,rounded_button=True,md_bg_color=(1,1,1,1),pos_hint={"x":0.5}))
+
+            label = Label(text=fa(i), size_hint=(None, None), color="black", 
+                          font_name="Vazir", font_size=47)
+
+            float_layout = FloatLayout(size_hint_y=None, height=StationBtns[len(StationBtns)-1].height)
+            if lines.index(i) % 2 == 0:
+                xlabel = 0.7
             else:
-                xlabel=0.2
-            StationBtn.pos_hint = {'center_x': 0.5, 'center_y': 0.5} # Position button to the left
-            label.pos_hint = {'x': xlabel, 'center_y': 0.1 }
-            float_layout.add_widget(StationBtn)
+                xlabel = 0.2
+
+            StationBtns[len(StationBtns)-1].pos_hint = {'center_x': 0.5, 'center_y': 0.5}
+            label.pos_hint = {'x': xlabel, 'center_y': 0.1}
+            float_layout.add_widget(StationBtns[len(StationBtns)-1])
             float_layout.add_widget(label)
             layoutscroll.add_widget(float_layout)
-        layoutscroll.bind(minimum_height=self.update_line)
-        self.bind(size=self.update_line_position)
+            StationBtns[len(StationBtns)-1].bind(on_press=lambda instance, idx=len(StationBtns)-1: self.stationBtn_pressed(idx, self.adad))
+            self.bind(size=lambda instance, value: self.update_label_size(label, self.width, self.height))
+
         root.add_widget(layoutscroll)
         self.add_widget(root)
+
+        inside_header = RelativeLayout(size_hint=(1, 0.1), pos_hint={'top': 1})
+        headerLabel = Label(text=get_display(arabic_reshaper.reshape("خط "+self.adad)), font_size=50, font_name='Vazir-Bold', 
+                            color="white", pos_hint={'x': 0, 'y': 0})
+        inside_header.add_widget(headerLabel)
+        self.add_widget(inside_header)
+
+        self.back_layout = FloatLayout(size_hint=(0.2, 0.1), pos_hint={'x': 0.05, 'top': 1}) 
+        backBtn = Button(background_normal="back.png", background_down="back.png") 
+        self.back_layout.add_widget(backBtn) 
+        self.add_widget(self.back_layout)
+        backBtn.bind(on_press=self.back_pressed)
+        layoutscroll.bind(minimum_height=self.update_line)
+        self.bind(size=self.update_line_position)
+
+    def update_label_size(self, label, width, height):
+        label.font_size = height * 0.02  # Adjust font size based on the height of the window
+        label.size_hint = (None, None)   # Ensure size_hint is None to manually set size
+        label.size = (width * 0.2, height * 0.05)  # Adjust the size based on the width and height of the window
     def update_rect(self, *args): 
         self.rect.pos = (0, self.height * 0.9) # Adjust position to be 90% down the screen 
         self.rect.size = (self.width, self.height * 0.1)
     def update_line(self, instance, value):
         self.line.points = [Window.width / 2, 0, Window.width / 2, instance.height]
+
     def update_line_position(self, *args):
         self.line.points = [self.width / 2, 0, self.width / 2, self.line.points[3]]
 
+    def back_pressed(self,*args):
+        sm.current="tehranline"
 
+    def stationBtn_pressed(self,namd,adadd,*args):
+        sm.current=str(adadd)+','+str(namd+1)
+
+class StationWin(Screen):
+    def __init__(self,nam,rang,adad,esm,**kwargs):
+        super(StationWin, self).__init__(**kwargs)
+        self.rang = rang
+        self.adad = adad
+        self.esm = esm
+        self.nam = nam
+        with self.canvas.before:
+            self.rect_color = Color(*self.rang)
+            self.rect = Rectangle()
+        self.bind(size=self.update_rect, pos=self.update_rect)
+        line = open(os.path.join(script_dir, self.esm), "r", encoding='utf-8')
+        lines = line.readlines()
+        staLine=lines[adad-1].split(" - ")
+        
+        staName=staLine[0]
+        inside_header = RelativeLayout(size_hint=(1, 0.1), pos_hint={'top': 1})
+        headerLabel = Label(text=fa(staName), font_size=50, font_name='Vazir-Bold', color="white", pos_hint={'x': 0, 'y': 0})
+        inside_header.add_widget(headerLabel)
+        self.add_widget(inside_header)
+
+        staEnters=staLine[1]
+        staATMs=staLine[2]
+        staPlaces=staLine[3]
+        self.layout = GridLayout(size_hint=(1,.9))
+        self.layout.rows=6
+        self.layout.cols=1
+        lblenters=Label(text=fa("تعداد ورودی ها :"),color="black", font_name="Vazir-Bold", font_size=50)
+        self.layout.add_widget(lblenters)
+        enters=Label(text=fa(staEnters),color="black", font_name="Vazir", font_size=45)
+        self.layout.add_widget(enters)
+        lblatms=Label(text=fa("تعداد خودپرداز ها :"),color="black", font_name="Vazir-Bold", font_size=50)
+        self.layout.add_widget(lblatms)
+        atms=Label(text=fa(staATMs),color="black", font_name="Vazir", font_size=45)
+        self.layout.add_widget(atms)
+        lblplaces=Label(text=fa("مکان های مهم اطراف :"),color="black", font_name="Vazir-Bold", font_size=50)
+        self.layout.add_widget(lblplaces)
+        places=Label(text=fa(staPlaces),color="black", font_name="Vazir", font_size=45)
+        self.layout.add_widget(places)
+
+        self.add_widget(self.layout)
+
+        self.back_layout = FloatLayout(size_hint=(0.2, 0.1), pos_hint={'x': 0.05, 'top': 1}) 
+        backBtn = Button(background_normal="back.png", background_down="back.png") 
+        self.back_layout.add_widget(backBtn) 
+        self.add_widget(self.back_layout)
+        backBtn.bind(on_press=lambda instance,idx=self.nam: self.back_pressed(idx))
+
+    def update_rect(self, *args): 
+        self.rect.pos = (0, self.height * 0.9) # Adjust position to be 90% down the screen 
+        self.rect.size = (self.width, self.height * 0.1)
+
+    def back_pressed(self,namd,*args):
+        sm.current="tehline"+str(namd)
+    
 class WindowManager(ScreenManager):
     pass
 
 sm = WindowManager()
 
 class MyApp(MDApp):
-    def build(self): 
-        screens = [ WelcomeWindow(name="welcome"),
-            TehranLinesWin(name="tehranline"),
+    def build(self):
+        screens = []
+        tehlinecolors = [(1,0,0,1),(0,0,1,1),(0,0.8,1,1),(1,0.89,0,1),(0,0.5,0,1),(1,0.45,0.85,1),(0.65,0,1,1)]
+        
+        # Adding LineWin screens
+        for i in range(1, 8):
+            screens.append(LineWin(name="tehline" + str(i), esm="tehran\\line" + str(i) + ".txt", adad=str(i), rang=tehlinecolors[i - 1]))
+        
+        # Adding StationWin screens
+        for i in range(1, 8):
+            line = open(os.path.join(script_dir, "tehran\\line" + str(i) + ".txt"), "r", encoding='utf-8')
+            lines = line.readlines()
+            for j in range(1, len(lines) + 1):
+                screens.append(StationWin(name=str(i) + ',' + str(j), nam=i, adad=j, rang=tehlinecolors[i - 1], esm="tehran\\line" + str(i) + "info.txt"))
+        
+        # Adding other screens
+        screens += [
+            WelcomeWindow(name="welcome"),
+            TehranLineWin(name="tehranline"),
             TehranMap(name="tehranmap"),
             TehranAPIMap(name="tehranapimap"),
             TehranNav(name="tehrannav"), 
-            Setting(name="setting")]
-        j=0
-        for i in ("tehran\\line1.txt","tehran\\line1.txt","tehran\\line1.txt","tehran\\line1.txt","tehran\\line1.txt","tehran\\line1.txt","tehran\\line1.txt"):
-            j+=1
-            screens.append(LineWin(name="tehranline"+str(j)+"win",direc=i))
-
+            Setting(name="setting")
+        ]
+        
+        # Adding all screens to the ScreenManager
         for screen in screens:
             sm.add_widget(screen)
+        
         sm.current = "welcome"
         return sm
+
         
         
 if __name__=="__main__":
