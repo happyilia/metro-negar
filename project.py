@@ -222,14 +222,6 @@ class TehranLineWin(Screen):
         sm.current="tehline6"
     def line7_pressed(self, instance):
         sm.current="tehline7"
-
-
-        
-
-
-
-    
-
         
 
 class Setting(Screen):
