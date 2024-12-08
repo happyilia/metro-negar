@@ -6,9 +6,20 @@ kv = Builder.load_file("my.kv")
 Window.clearcolor = (1, 1, 1, 1)
 
 def fa(txt):
-    return get_display(arabic_reshaper.reshape(txt))
-
-
+    return txt
+config = Config()
+config.change(
+    direction='ltr',
+    font_name='Vazir',
+    # file_regular='{path}.ttf',
+    # file_bold='{path}.ttf',
+    # file_italic='{path}.ttf',
+    # file_bolditalic='{path}.ttf'
+)
+class WindowManager(ScreenManager):
+    pass
+sm = WindowManager()
+screens = []
         
 class WelcomeWindow(Screen):
     def __init__(self,**kwargs):
@@ -333,6 +344,7 @@ class TehranNav(Screen):
     def __init__(self, **kwargs):
         super(TehranNav, self).__init__(**kwargs)
     def on_kv_post(self, base_widget):
+        global screens
         with self.canvas.before:
             self.rect_color = Color(0.4, 0.4, 0.4, 1)
             self.rect = Rectangle()
@@ -369,6 +381,20 @@ class TehranNav(Screen):
         inside_header.add_widget(headerLabel)
         self.add_widget(inside_header)
 
+
+        self.layout=GridLayout(pos_hint={'x': 0.25, 'y':0.3},size_hint=(0.5,0.45))
+        self.layout.rows=3
+        self.layout.cols=1
+        self.mabdaTextinp=TextInput(pos=(0.4,0),hint_text=fa("مبدا"),hint_text_color=(0.4, 0.4, 0.4, 1),font_name='Vazir',background_color="white",border=(4,4,4,4),base_direction='rtl',font_context='Vazir',text_language='fa')
+        self.maghsadTextinp=TextInput(pos=(0.4,0),hint_text=fa("مقصد"),hint_text_color=(0.4, 0.4, 0.4, 1),font_name='Vazir',background_color="white",border=(4,4,4,4),base_direction='rtl',font_context='Vazir',text_language='fa')
+        searchBtn=Button(text=fa('جستجو'), font_size=40,font_name='Vazir',background_color=(0,0,0.75,1))
+        self.btnlayout=GridLayout(size_hint=(0.5,0.5),rows=1,cols=1)
+        self.layout.add_widget(self.mabdaTextinp)
+        self.layout.add_widget(self.maghsadTextinp)
+        self.btnlayout.add_widget(searchBtn)
+        self.layout.add_widget(self.btnlayout)
+        self.add_widget(self.layout)
+        searchBtn.bind(on_press=lambda instance: self.search_pressed(screens,instance))
     def update_rect(self, *args): 
         self.rect.pos = (0, self.height * 0.9) # Adjust position to be 90% down the screen 
         self.rect.size = (self.width, self.height * 0.1)
@@ -381,21 +407,46 @@ class TehranNav(Screen):
         sm.current = "tehranmap"
     def setting_pressed(self, instance):
         sm.current = "setting"
-
+    def search_pressed(self,screens, instance):
+        
+        lines=''
+        for i in range(1,8):
+            line = open(os.path.join(script_dir, "tehran\\line" + str(i) + ".txt"), "r", encoding='utf-8')
+            lines += line.read()
+        lines=lines.split('\n')
+        
+        if self.mabdaTextinp.text in lines and self.maghsadTextinp.text in lines:
+            root = ScrollView(size_hint=(1, 0.9))
+            layoutscroll = GridLayout(cols=1, spacing=50, size_hint_y=None)
+            for i in range(lines.index(self.mabdaTextinp.text),lines.index(self.maghsadTextinp.text)+1):
+                layoutscroll.add_widget(IrLabel(text=get_display(arabic_reshaper.reshape(lines[i]))))
+                print(get_display(arabic_reshaper.reshape(lines[i])))
+            root.add_widget(layoutscroll)
+            
+            
+            screens.append(LineWin(name="search", esm="tehran\\line" + str(1) + ".txt", adad=str(1), rang=(0,0,0,1),t=True,stations=lines[lines.index(self.mabdaTextinp.text):lines.index(self.maghsadTextinp.text)+1]))
+            sm.add_widget(screens[len(screens)-1])
+            sm.current="search"
+            self.mabdaTextinp.text=''
+            self.maghsadTextinp.text=''
 
 class LineWin(Screen):
-    def __init__(self, esm,adad,rang, **kwargs):
+    def __init__(self, esm,adad,rang,t,stations, **kwargs):
         super(LineWin, self).__init__(**kwargs)
         self.esm = esm
         self.adad = adad
         self.rang = rang
-        
+        self.t=t
+        self.stations=stations
         
         # Ensure 'esm' is passed correctly and used to open the file
-        line = open(os.path.join(script_dir, self.esm), "r", encoding='utf-8')
-        lines = line.readlines()
+        if not self.t:
+            line = open(os.path.join(script_dir, self.esm), "r", encoding='utf-8')
+            lines = line.readlines()
+        else:
+            lines = self.stations
         layoutscroll = GridLayout(cols=1, spacing=70, size_hint_y=None)
-        layoutscroll.bind(minimum_height=layoutscroll.setter('height'))
+
 
         root = ScrollView(size_hint=(1, None), size=(Window.width, Window.height * 0.885))
 
@@ -432,9 +483,10 @@ class LineWin(Screen):
 
         root.add_widget(layoutscroll)
         self.add_widget(root)
+        layoutscroll.bind(minimum_height=lambda instance, value: self.update_line(layoutscroll, max(value, Window.height * 0.885)))
 
         inside_header = RelativeLayout(size_hint=(1, 0.1), pos_hint={'top': 1})
-        headerLabel = Label(text=get_display(arabic_reshaper.reshape("خط "+self.adad)), font_size=50, font_name='Vazir-Bold', 
+        headerLabel = Label(text="خط "+self.adad, font_size=50, font_name='Vazir-Bold', 
                             color="white", pos_hint={'x': 0, 'y': 0})
         inside_header.add_widget(headerLabel)
         self.add_widget(inside_header)
@@ -451,20 +503,37 @@ class LineWin(Screen):
         label.font_size = height * 0.02  # Adjust font size based on the height of the window
         label.size_hint = (None, None)   # Ensure size_hint is None to manually set size
         label.size = (width * 0.2, height * 0.05)  # Adjust the size based on the width and height of the window
-    def update_rect(self, *args): 
-        self.rect.pos = (0, self.height * 0.9) # Adjust position to be 90% down the screen 
+    def update_rect(self, *args):
+        self.rect.pos = (0, self.height * 0.9)
         self.rect.size = (self.width, self.height * 0.1)
+
     def update_line(self, instance, value):
-        self.line.points = [Window.width / 2, 0, Window.width / 2, instance.height]
+        scroll_y = self.ids.scroll_view.scroll_y if 'scroll_view' in self.ids else 0
+        self.line.points = [Window.width / 2, 0, Window.width / 2, max(instance.height, Window.height * 0.885)]
+        if 'scroll_view' in self.ids:
+            self.ids.scroll_view.scroll_y = scroll_y
 
     def update_line_position(self, *args):
-        self.line.points = [self.width / 2, 0, self.width / 2, self.line.points[3]]
+        scroll_y = self.ids.scroll_view.scroll_y if 'scroll_view' in self.ids else 0
+        self.line.points = [self.width / 2, 0, self.width / 2, max(self.line.points[3], self.height)]
+        if 'scroll_view' in self.ids:
+            self.ids.scroll_view.scroll_y = scroll_y
+
+
 
     def back_pressed(self,*args):
         sm.current="tehranline"
+        if self.t:
+            sm.remove_widget(screens[len(screens)-1])
+            print("suc",screens[len(screens)-1])
+            screens.pop()
 
     def stationBtn_pressed(self,namd,adadd,*args):
         sm.current=str(adadd)+','+str(namd+1)
+        if self.t:
+            sm.remove_widget(screens[len(screens)-1])
+            screens.pop()
+            
 
 class StationWin(Screen):
     def __init__(self,nam,rang,adad,esm,**kwargs):
@@ -521,19 +590,17 @@ class StationWin(Screen):
     def back_pressed(self,namd,*args):
         sm.current="tehline"+str(namd)
     
-class WindowManager(ScreenManager):
-    pass
 
-sm = WindowManager()
+
 
 class MyApp(MDApp):
     def build(self):
-        screens = []
+        global screens
         tehlinecolors = [(1,0,0,1),(0,0,1,1),(0,0.8,1,1),(1,0.89,0,1),(0,0.5,0,1),(1,0.45,0.85,1),(0.65,0,1,1)]
         
         # Adding LineWin screens
         for i in range(1, 8):
-            screens.append(LineWin(name="tehline" + str(i), esm="tehran\\line" + str(i) + ".txt", adad=str(i), rang=tehlinecolors[i - 1]))
+            screens.append(LineWin(name="tehline" + str(i), esm="tehran\\line" + str(i) + ".txt", adad=str(i), rang=tehlinecolors[i - 1],t=False,stations=[]))
         
         # Adding StationWin screens
         for i in range(1, 8):
