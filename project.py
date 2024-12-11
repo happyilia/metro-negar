@@ -431,21 +431,15 @@ class TehranNav(Screen):
         
         mab=finder(self.mabdaTextinp.text)
         magh=finder(self.maghsadTextinp.text)
+        print (mab,magh)
         if  mab!=False and  magh!=False:
-            root = ScrollView(size_hint=(1, 0.9))
             global tehlinecolors
-            layoutscroll = GridLayout(cols=1, spacing=50, size_hint_y=None)
             file_path = os.path.join(script_dir, "tehran\\line"+mab[0]+".txt")
             linetxt= open(file_path,'r', encoding='utf-8')
-            linetxt=linetxt.read()
-            linetxt = linetxt.split('\n')
-            for i in range(min(int(mab[2]),int(magh[2])),max(int(mab[2]),int(magh[2]))):
-                layoutscroll.add_widget(IrLabel(text=get_display(arabic_reshaper.reshape(linetxt[i-1]))))
+            linetxt=linetxt.readlines()
+            for i in range(min(int(mab[2:]),int(magh[2:])),max(int(mab[2:]),int(magh[2:]))+1):
                 print(get_display(arabic_reshaper.reshape(linetxt[i-1])))
-            root.add_widget(layoutscroll)
-            
-            
-            screens.append(LineWin(name="search", esm="tehran\\line" + str(1) + ".txt", adad=str(1), rang=tehlinecolors[int(mab[0])-1],t=True,stations=linetxt[min(int(mab[2]),int(magh[2]))-1:max(int(mab[2]),int(magh[2]))]))
+            screens.append(LineWin(name="search", esm="tehran\\line" + mab[0] + ".txt", adad=mab[0], rang=tehlinecolors[int(mab[0])-1],t=True,stations=linetxt[min(int(mab[2:]),int(magh[2:]))-1:max(int(mab[2:]),int(magh[2:]))]))
             sm.add_widget(screens[len(screens)-1])
             sm.current="search"
         self.mabdaTextinp.text=''
@@ -485,7 +479,7 @@ class LineWin(Screen):
         for i in lines:
             StationBtns.append( BaseButton(line_width = 10,line_color=self.rang,rounded_button=True,md_bg_color=(1,1,1,1),pos_hint={"x":0.5}))
 
-            label = Label(text=fa(i), size_hint=(None, None), color="black", 
+            label = Label(text=i, size_hint=(None, None), color="black", 
                           font_name="Vazir", font_size=47)
 
             float_layout = FloatLayout(size_hint_y=None, height=StationBtns[len(StationBtns)-1].height)
@@ -547,7 +541,7 @@ class LineWin(Screen):
         sm.current="tehranline"
         if self.t:
             sm.remove_widget(screens[len(screens)-1])
-            print("suc",screens[len(screens)-1])
+            
             screens.pop()
 
     def stationBtn_pressed(self,namd,adadd,*args):
