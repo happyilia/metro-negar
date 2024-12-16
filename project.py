@@ -431,15 +431,18 @@ class TehranNav(Screen):
         
         mab=finder(self.mabdaTextinp.text)
         magh=finder(self.maghsadTextinp.text)
-        print (mab,magh)
         if  mab!=False and  magh!=False:
             global tehlinecolors
             file_path = os.path.join(script_dir, "tehran\\line"+mab[0]+".txt")
             linetxt= open(file_path,'r', encoding='utf-8')
-            linetxt=linetxt.readlines()
-            for i in range(min(int(mab[2:]),int(magh[2:])),max(int(mab[2:]),int(magh[2:]))+1):
-                print(get_display(arabic_reshaper.reshape(linetxt[i-1])))
-            screens.append(LineWin(name="search", esm="tehran\\line" + mab[0] + ".txt", adad=mab[0], rang=tehlinecolors[int(mab[0])-1],t=True,stations=linetxt[min(int(mab[2:]),int(magh[2:]))-1:max(int(mab[2:]),int(magh[2:]))]))
+            linetxt=linetxt.read().split('\n')
+            if int(magh[2:])>int(mab[2:]):
+                screens.append(LineWin(name="search", esm="tehran\\line" + mab[0] + ".txt", adad=mab[0], rang=tehlinecolors[int(mab[0])-1],t=True,stations=linetxt[min(int(mab[2:]),int(magh[2:]))-1:max(int(mab[2:]),int(magh[2:]))]))
+            else:
+                tline=linetxt[min(int(mab[2:]),int(magh[2:]))-1:max(int(mab[2:]),int(magh[2:]))]
+                tline.reverse()
+                screens.append(LineWin(name="search", esm="tehran\\line" + mab[0] + ".txt", adad=mab[0], rang=tehlinecolors[int(mab[0])-1],t=True,stations=tline))
+
             sm.add_widget(screens[len(screens)-1])
             sm.current="search"
         self.mabdaTextinp.text=''
@@ -493,7 +496,10 @@ class LineWin(Screen):
             float_layout.add_widget(StationBtns[len(StationBtns)-1])
             float_layout.add_widget(label)
             layoutscroll.add_widget(float_layout)
-            StationBtns[len(StationBtns)-1].bind(on_press=lambda instance, idx=len(StationBtns)-1: self.stationBtn_pressed(idx, self.adad))
+            if not self.t:
+                StationBtns[len(StationBtns)-1].bind(on_press=lambda instance, idx=len(StationBtns)-1: self.stationBtn_pressed(idx, self.adad))
+            else:
+                StationBtns[len(StationBtns)-1].bind(on_press=lambda instance, idx=int(finder(lines[len(StationBtns)-1])[2:])-1 : self.stationBtn_pressed(idx, self.adad))
             self.bind(size=lambda instance, value: self.update_label_size(label, self.width, self.height))
 
         root.add_widget(layoutscroll)
