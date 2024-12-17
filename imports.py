@@ -27,3 +27,4 @@ from kivyir import *
 from kivy.uix.popup import Popup
 from kivy.uix.image import Image
 from kivy.uix.scatter import Scatter
+from kivymd.uix.circularlayout import MDCircularLayout

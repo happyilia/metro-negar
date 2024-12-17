@@ -365,8 +365,8 @@ class TehranMap(Screen):
         file_path = os.path.join(script_dir, "tehran\\map.png")
         self.Grid=GridLayout(pos_hint={'center_x':.5,'center_y':.5},size_hint=(1,0.8),rows=1,cols=1)
         self.scatter=Scatter(do_translation=False,do_rotation=False,pos_hint={'center_x':.5,'center_y':.5},size_hint=(1,1),scale_min=1)
-        self.scatter.add_widget(Image(source=file_path,size_hint=(1,1),pos_hint={'center_x':.5,'center_y':.5}))
-        self.Grid.add_widget(self.scatter)
+        self.Grid.add_widget(Image(source=file_path,size_hint=(1,1),pos_hint={'center_x':.5,'center_y':.5}))
+        
         self.add_widget(self.Grid)
 
 
@@ -427,9 +427,9 @@ class TehranNav(Screen):
         self.layout=GridLayout(pos_hint={'x': 0.25, 'y':0.3},size_hint=(0.5,0.45))
         self.layout.rows=3
         self.layout.cols=1
-        self.mabdaTextinp=TextInput(pos=(0.4,0),hint_text=fa("مبدا"),hint_text_color=(0.4, 0.4, 0.4, 1),font_name='Vazir',background_color="white",border=(4,4,4,4),base_direction='rtl',font_context='Vazir',text_language='fa')
-        self.maghsadTextinp=TextInput(pos=(0.4,0),hint_text=fa("مقصد"),hint_text_color=(0.4, 0.4, 0.4, 1),font_name='Vazir',background_color="white",border=(4,4,4,4),base_direction='rtl',font_context='Vazir',text_language='fa')
-        searchBtn=Button(text=fa('جستجو'), font_size=40,font_name='Vazir',background_color=(0,0,0.75,1))
+        self.mabdaTextinp=TextInput(size_hint=(1,0.4),pos=(0.4,0),hint_text=fa("مبدا"),hint_text_color=(0.4, 0.4, 0.4, 1),font_name='Vazir',background_color="white",border=(4,4,4,4),base_direction='rtl',font_context='Vazir',text_language='fa')
+        self.maghsadTextinp=TextInput(size_hint=(1,0.4),pos=(0.4,0),hint_text=fa("مقصد"),hint_text_color=(0.4, 0.4, 0.4, 1),font_name='Vazir',background_color="white",border=(4,4,4,4),base_direction='rtl',font_context='Vazir',text_language='fa')
+        searchBtn=Button(size_hint=(1,0.2),text=fa('جستجو'), font_size=40,font_name='Vazir',background_color=(0,0,0.75,1))
         self.btnlayout=GridLayout(size_hint=(0.5,0.5),rows=1,cols=1)
         self.layout.add_widget(self.mabdaTextinp)
         self.layout.add_widget(self.maghsadTextinp)
