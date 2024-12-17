@@ -175,9 +175,9 @@ class TehranLineWin(Screen):
             self.linelabel2 = Label(text=fa(clean_text),font_size = 40, font_name='Vazir-Bold' ,color="black",pos_hint = {'center_x':xlabel , 'y':i-0.5})
             self.add_widget(self.linelabel2)
 
-        self.searchbox=TextInput(pos_hint={'x':0.05,'y':0.8},size_hint=(0.3,0.08),hint_text=fa("نام ایستگاه/مکان"),hint_text_color=(0.4, 0.4, 0.4, 1),font_name='Vazir',background_color="white",border=(4,4,4,4),base_direction='rtl',font_context='Vazir',text_language='fa')
+        self.searchbox=TextInput(pos_hint={'x':0.01,'y':0.8},size_hint=(0.3,0.08),hint_text=fa("نام ایستگاه/مکان"),hint_text_color=(0.4, 0.4, 0.4, 1),font_name='Vazir',background_color="white",border=(4,4,4,4),base_direction='rtl',font_context='Vazir',text_language='fa')
         self.add_widget(self.searchbox)
-        self.searchBtn=MDIconButton(pos_hint={'x':0.37,'y':0.8},size_hint=(0.08,0.08),icon="magnify",line_width=5,line_color=(0,0,0,1),rounded_button=True,md_bg_color=(0.75, 0.75, 0.75, 1))
+        self.searchBtn=MDIconButton(pos_hint={'x':0.33,'y':0.8},size_hint=(0.08,0.08),icon="magnify",line_width=5,line_color=(0,0,0,1),rounded_button=True,md_bg_color=(0.75, 0.75, 0.75, 1))
         self.add_widget(self.searchBtn)
         self.searchBtn.bind(on_press=self.searchBtn_pressed)
 
