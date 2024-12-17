@@ -25,3 +25,5 @@ from kivy.uix.scrollview import ScrollView
 from kivy.uix.relativelayout import RelativeLayout
 from kivyir import *
 from kivy.uix.popup import Popup
+from kivy.uix.image import Image
+from kivy.uix.scatter import Scatter

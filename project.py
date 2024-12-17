@@ -362,6 +362,14 @@ class TehranMap(Screen):
         inside_header.add_widget(headerLabel)
         self.add_widget(inside_header)
 
+        file_path = os.path.join(script_dir, "tehran\\map.png")
+        self.Grid=GridLayout(pos_hint={'center_x':.5,'center_y':.5},size_hint=(1,0.8),rows=1,cols=1)
+        self.scatter=Scatter(do_translation=False,do_rotation=False,pos_hint={'center_x':.5,'center_y':.5},size_hint=(1,1),scale_min=1)
+        self.scatter.add_widget(Image(source=file_path,size_hint=(1,1),pos_hint={'center_x':.5,'center_y':.5}))
+        self.Grid.add_widget(self.scatter)
+        self.add_widget(self.Grid)
+
+
     def update_rect(self, *args): 
         self.rect.pos = (0, self.height * 0.9) # Adjust position to be 90% down the screen 
         self.rect.size = (self.width, self.height * 0.1)
