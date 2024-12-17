@@ -29,7 +29,18 @@ def finder(txt):
             return str(i)+','+str(linetxt.index(txt)+1)
     return False
 
-
+def nearplacesfinder(txt):
+    
+    for i in range(1,8):
+        file_path = os.path.join(script_dir, "tehran\\line"+str(i)+"infoplaces.txt")
+        linetxt= open(file_path,'r', encoding='utf-8')
+        linetxt=linetxt.read()
+        linetxt = linetxt.split('\n')
+        for j in linetxt:
+            if txt in j:
+                
+                return str(i)+','+str(linetxt.index(j)+1)
+    return False
 
 class WindowManager(ScreenManager):
     pass
@@ -249,6 +260,10 @@ class TehranLineWin(Screen):
         k=finder(self.searchbox.text)
         if k!=False:
             sm.current=k
+        else:
+            k=nearplacesfinder(self.searchbox.text)
+            if k!=False:
+                sm.current=k
         self.searchbox.text = ''
 
 class Setting(Screen):
