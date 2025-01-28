@@ -1,6 +1,8 @@
 import kivy
 import os
 import arabic_reshaper
+import re
+from kivy.uix.boxlayout import BoxLayout
 from bidi.algorithm import get_display
 from kivy.app import App
 from kivy.uix.label import Label

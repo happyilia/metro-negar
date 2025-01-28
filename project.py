@@ -1,4 +1,6 @@
 from imports import *
+from kivy.core.window import Window
+
 
 
 script_dir = os.path.dirname(os.path.abspath(__file__))
@@ -46,7 +48,10 @@ class WindowManager(ScreenManager):
     pass
 sm = WindowManager()
 screens = []
-        
+
+class TouchLabel(ButtonBehavior, Label):
+    pass
+
 class WelcomeWindow(Screen):
     def __init__(self,**kwargs):
         super(WelcomeWindow,self).__init__(**kwargs)
@@ -101,7 +106,7 @@ class TehranLineWin(Screen):
 
         with self.canvas.before:
             self.rect_color = Color(0.4, 0.4, 0.4, 1)
-            self.rect = Rectangle()
+            self.top_rect = Rectangle()
         
         with self.canvas:
             Color(1, 0, 0, 1) 
@@ -174,11 +179,24 @@ class TehranLineWin(Screen):
             clean_text = text.replace("\n","")
             self.linelabel2 = Label(text=fa(clean_text),font_size = 40, font_name='Vazir-Bold' ,color="black",pos_hint = {'center_x':xlabel , 'y':i-0.5})
             self.add_widget(self.linelabel2)
-
+        
         self.searchbox=TextInput(pos_hint={'x':0.01,'y':0.8},size_hint=(0.3,0.08),hint_text=fa("نام ایستگاه/مکان"),hint_text_color=(0.4, 0.4, 0.4, 1),font_name='Vazir',background_color="white",border=(4,4,4,4),base_direction='rtl',font_context='Vazir',text_language='fa')
         self.add_widget(self.searchbox)
-        self.searchBtn=MDIconButton(pos_hint={'x':0.33,'y':0.8},size_hint=(0.08,0.08),icon="magnify",line_width=5,line_color=(0,0,0,1),rounded_button=True,md_bg_color=(0.75, 0.75, 0.75, 1))
+        self.searchBtn=MDIconButton(pos_hint={'x':0.37,'y':0.8},size_hint=(0.08,0.08),icon="magnify",line_width=5,line_color=(0,0,0,1),rounded_button=True,md_bg_color=(0.75, 0.75, 0.75, 1))
         self.add_widget(self.searchBtn)
+        self.search_results_scroll = ScrollView(size_hint=(0.3, 0), pos_hint={'x':0.01, 'y':0.62})
+        with self.search_results_scroll.canvas.before:
+            Color(1, 1, 1, 1)  # White color
+            self.rect = Rectangle(size=self.search_results_scroll.size, pos=self.search_results_scroll.pos)
+            self.search_results_scroll.bind(size=self.update_scroll_rect, pos=self.update_scroll_rect)
+        
+        self.search_results_box = BoxLayout(orientation='vertical', size_hint_y=None, spacing=40, padding=(10, 10))
+        self.search_results_box.bind(minimum_height=self.search_results_box.setter('height'))
+        self.search_results_scroll.add_widget(self.search_results_box)
+        self.add_widget(self.search_results_scroll)
+
+
+        self.searchbox.bind(text=self.on_text)
         self.searchBtn.bind(on_press=self.searchBtn_pressed)
 
         self.inside_footer = FloatLayout(pos_hint={'x': 0, 'y': 0}, size_hint=(1, 0.1))
@@ -210,23 +228,31 @@ class TehranLineWin(Screen):
         headerLabel = Label(text=fa("فهرست خطوط"), font_size=50, font_name='Vazir-Bold', color="white", pos_hint={'x': 0, 'y': 0})
         inside_header.add_widget(headerLabel)
         self.add_widget(inside_header)
-
-        
-        
         
 
+   
+        
+        
+        
+    def update_scroll_size(self, instance, value):
+        self.search_results_scroll.height = self.searchbox.height * 2
 
     def update_rect(self, *args): 
-        self.rect.pos = (0, self.height * 0.9) # Adjust position to be 90% down the screen 
-        self.rect.size = (self.width, self.height * 0.1)
+        self.top_rect.pos = (0, self.height * 0.9) # Adjust position to be 90% down the screen 
+        self.top_rect.size = (self.width, self.height * 0.1)
+
+    def update_scroll_rect(self, instance, value):
+        self.rect.size = instance.size
+        self.rect.pos = instance.pos
+
     def update_line_position(self, *args):
-        self.line.points = [self.children[1].center_x, self.children[24].center_y, self.width, self.children[24].center_y]
-        self.line2.points = [self.children[1].center_x, self.children[23].center_y, 0, self.children[23].center_y]
-        self.line3.points = [self.children[1].center_x, self.children[22].center_y, self.width, self.children[22].center_y]
-        self.line4.points = [self.children[1].center_x, self.children[21].center_y, 0, self.children[21].center_y]
-        self.line5.points = [self.children[1].center_x, self.children[20].center_y, self.width, self.children[20].center_y]
-        self.line6.points = [self.children[1].center_x, self.children[19].center_y, 0, self.children[19].center_y]
-        self.line7.points = [self.children[1].center_x, self.children[18].center_y, self.width, self.children[18].center_y]
+        self.line.points = [self.children[1].center_x, self.children[25].center_y, self.width, self.children[25].center_y]
+        self.line2.points = [self.children[1].center_x, self.children[24].center_y, 0, self.children[24].center_y]
+        self.line3.points = [self.children[1].center_x, self.children[23].center_y, self.width, self.children[23].center_y]
+        self.line4.points = [self.children[1].center_x, self.children[22].center_y, 0, self.children[22].center_y]
+        self.line5.points = [self.children[1].center_x, self.children[21].center_y, self.width, self.children[21].center_y]
+        self.line6.points = [self.children[1].center_x, self.children[20].center_y, 0, self.children[20].center_y]
+        self.line7.points = [self.children[1].center_x, self.children[19].center_y, self.width, self.children[19].center_y]
         
         
         
@@ -255,7 +281,55 @@ class TehranLineWin(Screen):
         sm.current="tehline6"
     def line7_pressed(self, instance):
         sm.current="tehline7"
+    def on_label_touch_down(self, instance, touch):
+        if instance.collide_point(*touch.pos):
+            self.label_selected(instance)
+            return True
+        return False
+
+    def on_touch_down(self, touch):
+        if self.search_results_box.collide_point(*touch.pos):
+            for child in self.search_results_box.children:
+                if child.collide_point(*touch.pos):
+                    self.label_selected(child,touch)
+                    return True  # Propagate touch event to the correct child
+        return super(TehranLineWin, self).on_touch_down(touch)
+    def on_text(self, instance, value):
+        self.search_results_box.clear_widgets()
+        if value.strip(): 
+            matches = self.search_names(value)
+            for match in matches:
+                label = Label(text=fa(match), font_size=40, font_name='Vazir-Bold', color="black")
+                label.bind(on_touch_down=self.on_label_touch_down)
+                self.search_results_box.add_widget(label)
+            self.search_results_scroll.size_hint_y = None  
+            self.search_results_scroll.height = self.searchbox.height * 2 
+        else:
+            self.search_results_scroll.size_hint_y = 0
+
+    def label_selected(self, instance):
+        self.searchbox.text = instance.text
+
+
+    def search_names(self, query):
+        script_dir = os.path.dirname(__file__)
+        names = []
+        for i in range(1, 8):
+            file_path = os.path.join(script_dir, "tehran", f"line{i}.txt")
+            with open(file_path, 'r', encoding='utf-8') as file:
+                names.extend([line.strip() for line in file])
+            
+        pattern = re.compile(query, re.IGNORECASE)
+        for i in range(1, 8):
+            file_path = os.path.join(script_dir, "tehran", f"line{i}infoplaces.txt")
+            with open(file_path, 'r', encoding='utf-8') as file:
+                names.extend([line.strip("، ") for line in file])
+            
         
+            
+        pattern = re.compile(query, re.IGNORECASE)
+        return [name for name in names if pattern.search(name)]
+    
     def searchBtn_pressed(self,instance):
         k=finder(self.searchbox.text)
         if k!=False:
@@ -484,10 +558,17 @@ class LineWin(Screen):
         if not self.t:
             line = open(os.path.join(script_dir, self.esm), "r", encoding='utf-8')
             lines = line.readlines()
+            besamt=lines[len(lines)-1]
         else:
+            line = open(os.path.join(script_dir, self.esm), "r", encoding='utf-8')
+            linet=line.read().split('\n')
+            print(linet[0],linet[1])
             lines = self.stations
+            if linet.index(lines[len(lines)-1])>linet.index(lines[0]):
+                besamt=linet[len(linet)-1]
+            else:
+                besamt=linet[0]
         layoutscroll = GridLayout(cols=1, spacing=70, size_hint=(1,None))
-
 
         root = ScrollView(size_hint=(1, None), size=(Window.width, Window.height * 0.885))
 
@@ -530,7 +611,7 @@ class LineWin(Screen):
         layoutscroll.bind(minimum_height=lambda instance, value: self.update_line(layoutscroll, max(value, Window.height * 0.885)))
 
         inside_header = RelativeLayout(size_hint=(1, 0.1), pos_hint={'top': 1})
-        headerLabel = Label(text="خط "+self.adad, font_size=50, font_name='Vazir-Bold', 
+        headerLabel = Label(text="خط "+self.adad +" به سمت: "+besamt, font_size=50, font_name='Vazir-Bold', 
                             color="white", pos_hint={'x': 0, 'y': 0})
         inside_header.add_widget(headerLabel)
         self.add_widget(inside_header)
