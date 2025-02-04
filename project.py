@@ -1,6 +1,6 @@
 from imports import *
 from kivy.core.window import Window
-
+from kivy.clock import Clock
 
 
 script_dir = os.path.dirname(os.path.abspath(__file__))
@@ -18,6 +18,25 @@ config.change(
     # file_italic='{path}.ttf',
     # file_bolditalic='{path}.ttf'
 )
+
+def BFS_SP(graph, start, goal):
+    explored = []
+    queue = [[start]]
+    if start == goal:
+        return
+    while queue:
+        path = queue.pop(0)
+        node = path[-1]
+        if node not in explored:
+            neighbours = graph[node]
+            for neighbour in neighbours:
+                new_path = list(path)
+                new_path.append(neighbour)
+                queue.append(new_path)
+                if neighbour == goal:
+                    return new_path
+            explored.append(node)
+    return
 
 def finder(txt):
     
@@ -43,6 +62,46 @@ def nearplacesfinder(txt):
                 
                 return str(i)+','+str(linetxt.index(j)+1)
     return False
+
+
+def line_finder(pot):
+    lines=[]
+    for i in range(1,8):
+        file_path = os.path.join(script_dir, "tehran\\line"+str(i)+".txt")
+        linetxt= open(file_path,'r', encoding='utf-8')
+        linetxt=linetxt.read()
+        linetxt = linetxt.split('\n')
+        for j in pot:
+            if j in linetxt and i not in lines:
+                lines.append(i)
+    return lines
+
+#tehran_graph
+teh_graph={}
+teh_stations=[]
+o=0
+for i in range(1,8):
+    file_path = os.path.join(script_dir, "tehran\\line"+str(i)+".txt")
+    linetxt= open(file_path,'r', encoding='utf-8')
+    linetxt=linetxt.read()
+    linetxt = linetxt.split('\n')
+    for j in range(len(linetxt)):
+        if linetxt[j] not in teh_stations and j!=0 and j!=len(linetxt)-1:
+            teh_graph[linetxt[j]]={linetxt[j+1],linetxt[j-1]}
+            
+            teh_stations.append(linetxt[j])
+        elif j==0:
+            teh_graph[linetxt[j]]={linetxt[j+1]}
+            teh_stations.append(linetxt[j])
+        elif j==len(linetxt)-1:
+            teh_graph[linetxt[j]]={linetxt[j-1]}
+            
+            teh_stations.append(linetxt[j])
+        elif linetxt[j] in teh_stations:
+            teh_graph[linetxt[j]].update({linetxt[j+1],linetxt[j-1]})
+
+
+
 
 class WindowManager(ScreenManager):
     pass
@@ -525,23 +584,15 @@ class TehranNav(Screen):
         sm.current = "setting"
     def search_pressed(self,screens, instance):
         
+        path=BFS_SP(teh_graph, self.mabdaTextinp.text, self.maghsadTextinp.text)
         
-        mab=finder(self.mabdaTextinp.text)
-        magh=finder(self.maghsadTextinp.text)
-        if  mab!=False and  magh!=False:
-            global tehlinecolors
-            file_path = os.path.join(script_dir, "tehran\\line"+mab[0]+".txt")
-            linetxt= open(file_path,'r', encoding='utf-8')
-            linetxt=linetxt.read().split('\n')
-            if int(magh[2:])>int(mab[2:]):
-                screens.append(LineWin(name="search", esm="tehran\\line" + mab[0] + ".txt", adad=mab[0], rang=tehlinecolors[int(mab[0])-1],t=True,stations=linetxt[min(int(mab[2:]),int(magh[2:]))-1:max(int(mab[2:]),int(magh[2:]))]))
-            else:
-                tline=linetxt[min(int(mab[2:]),int(magh[2:]))-1:max(int(mab[2:]),int(magh[2:]))]
-                tline.reverse()
-                screens.append(LineWin(name="search", esm="tehran\\line" + mab[0] + ".txt", adad=mab[0], rang=tehlinecolors[int(mab[0])-1],t=True,stations=tline))
+        adads=line_finder(path)
+        
+        
+        screens.append(LineWin(name="search", esm="tehran\\line" + str(1) + ".txt", adad=adads,rang=(1,1,1,1), t=True,stations=path))
 
-            sm.add_widget(screens[len(screens)-1])
-            sm.current="search"
+        sm.add_widget(screens[len(screens)-1])
+        sm.current="search"
         self.mabdaTextinp.text=''
         self.maghsadTextinp.text=''
 
@@ -549,45 +600,52 @@ class LineWin(Screen):
     def __init__(self, esm,adad,rang,t,stations, **kwargs):
         super(LineWin, self).__init__(**kwargs)
         self.esm = esm
-        self.adad = adad
-        self.rang = rang
         self.t=t
         self.stations=stations
         
-        # Ensure 'esm' is passed correctly and used to open the file
-        if not self.t:
+        if self.t:
+            self.adad = adad
+            self.rang = rang
+            besamt=[]
+            start=0
+            for i in range(1,8):
+                file_path = os.path.join(script_dir, "tehran\\line"+str(i)+".txt")
+                linetxt= open(file_path,'r', encoding='utf-8')
+                linetxt=linetxt.read()
+                linetxt = linetxt.split('\n')
+                for j in range(start,len(self.stations)-1):
+                    if self.stations[j+1] in linetxt and self.stations[j] in linetxt:
+                        
+                        if linetxt.index(self.stations[j])>linetxt.index(self.stations[j+1])and linetxt[0] not in besamt:
+                            besamt.append(linetxt[0])
+                            
+                        elif linetxt.index(self.stations[j])<linetxt.index(self.stations[j+1]) and linetxt[len(linetxt)-1] not in besamt:
+                            besamt.append(linetxt[len(linetxt)-1])
+                        start+=1
+            lines = self.stations
+            rangs=[]
+            for i in range(len(self.stations)):
+                rangs.append(tehlinecolors[int(finder(self.stations[i])[0])-1])
+        else:
+            self.adad = adad
+            self.rang = rang
             line = open(os.path.join(script_dir, self.esm), "r", encoding='utf-8')
             lines = line.readlines()
+            rangs=[tehlinecolors[int(self.adad)-1]]*len(lines)
             besamt=lines[len(lines)-1]
-        else:
-            line = open(os.path.join(script_dir, self.esm), "r", encoding='utf-8')
-            linet=line.read().split('\n')
-            print(linet[0],linet[1])
-            lines = self.stations
-            if linet.index(lines[len(lines)-1])>linet.index(lines[0]):
-                besamt=linet[len(linet)-1]
-            else:
-                besamt=linet[0]
+                
         layoutscroll = GridLayout(cols=1, spacing=70, size_hint=(1,None))
-
         root = ScrollView(size_hint=(1, None), size=(Window.width, Window.height * 0.885))
-
-        # Draw the red line on the canvas
-        with root.canvas.before:
-            Color( *self.rang)
-            self.line = Line(points=[Window.width / 2, 0, Window.width / 2, layoutscroll.height],width=10)
-
-        with self.canvas.before:
-            self.rect_color = Color(*self.rang)
-            self.rect = Rectangle()
-        
         self.bind(size=self.update_rect, pos=self.update_rect)
         StationBtns=[]
+        r=0
         for i in lines:
-            StationBtns.append( BaseButton(line_width = 10,line_color=self.rang,rounded_button=True,md_bg_color=(1,1,1,1),pos_hint={"x":0.5}))
+            if self.t:
+                StationBtns.append( BaseButton(line_width = 10,line_color=rangs[r],rounded_button=True,md_bg_color=(1,1,1,1),pos_hint={"x":0.5}))
+            else:
+                StationBtns.append( BaseButton(line_width = 10,line_color=self.rang,rounded_button=True,md_bg_color=(1,1,1,1),pos_hint={"x":0.5}))
 
-            label = Label(text=i, size_hint=(None, None), color="black", 
-                          font_name="Vazir", font_size=47)
+            label = Label(text=i, size_hint=(None, None), color="black", font_name="Vazir", font_size=47)
 
             float_layout = FloatLayout(size_hint_y=None, height=StationBtns[len(StationBtns)-1].height)
             if lines.index(i) % 2 == 0:
@@ -595,23 +653,42 @@ class LineWin(Screen):
             else:
                 xlabel = 0.2
 
-            StationBtns[len(StationBtns)-1].pos_hint = {'center_x': 0.5, 'center_y': 0.5}
+            StationBtns[-1].pos_hint = {'center_x': 0.5, 'center_y': 0.5}
             label.pos_hint = {'x': xlabel, 'center_y': 0.1}
-            float_layout.add_widget(StationBtns[len(StationBtns)-1])
+            float_layout.add_widget(StationBtns[-1])
             float_layout.add_widget(label)
             layoutscroll.add_widget(float_layout)
             if not self.t:
                 StationBtns[len(StationBtns)-1].bind(on_press=lambda instance, idx=len(StationBtns)-1: self.stationBtn_pressed(idx, self.adad))
             else:
-                StationBtns[len(StationBtns)-1].bind(on_press=lambda instance, idx=int(finder(lines[len(StationBtns)-1])[2:])-1 : self.stationBtn_pressed(idx, self.adad))
+                StationBtns[len(StationBtns)-1].bind(on_press=lambda instance, idx=int(finder(lines[len(StationBtns)-1])[2:])-1, idx2= int(finder(lines[len(StationBtns)-1])[0]) : self.stationBtn_pressed(idx, idx2))
             self.bind(size=lambda instance, value: self.update_label_size(label, self.width, self.height))
-
+            r+=1
+        
+        
+        if not self.t:
+            with self.canvas.before:
+                self.rect_color = Color(*self.rang)
+                self.rect = Rectangle()
+        else:
+            with self.canvas.before:
+                self.rect_color = Color(0.5,0.5,0.5,1)
+                self.rect = Rectangle()
         root.add_widget(layoutscroll)
         self.add_widget(root)
-        layoutscroll.bind(minimum_height=lambda instance, value: self.update_line(layoutscroll, max(value, Window.height * 0.885)))
 
         inside_header = RelativeLayout(size_hint=(1, 0.1), pos_hint={'top': 1})
-        headerLabel = Label(text="خط "+self.adad +" به سمت: "+besamt, font_size=50, font_name='Vazir-Bold', 
+        if self.t:
+            adads=''
+            besamts=''
+            for i in self.adad:
+                adads+=str(i)+' و '
+            for i in besamt:
+                besamts+=i+' و '
+            headertext="خط "+ adads[:len(adads)-3] + " به سمت: " + besamts[:len(besamts)-3]
+        else:
+            headertext="خط "+str(self.adad) +" به سمت: "+besamt
+        headerLabel = Label(text=headertext, font_size=50, font_name='Vazir-Bold', 
                             color="white", pos_hint={'x': 0, 'y': 0})
         inside_header.add_widget(headerLabel)
         self.add_widget(inside_header)
@@ -622,8 +699,25 @@ class LineWin(Screen):
         self.add_widget(self.back_layout)
         backBtn.bind(on_press=self.back_pressed)
         layoutscroll.bind(minimum_height=layoutscroll.setter('height'))
+        self.StationBtns = StationBtns
+        self.layoutscroll = layoutscroll
+        self.rangs = rangs
+        Clock.schedule_once(self.update_positions_and_draw_lines, 0.1)
 
-        self.bind(size=self.update_line_position)
+    def update_lines_colors(self, layoutscroll, StationBtns, rangs):
+        layoutscroll.do_layout()
+        # First, update the positions of the buttons (ensure they are fully placed)
+
+        # Now, draw the lines between the buttons
+        with layoutscroll.canvas.before:
+            for i in range(len(StationBtns) - 1):
+                btn1 = StationBtns[i]
+                btn2 = StationBtns[i + 1]
+                Color(*rangs[i])
+                Line(points=[btn1.center_x, btn1.center_y, btn2.center_x, btn2.center_y], width=10)
+                print(f"Drawing line from {btn1.center_x}, {btn1.center_y} to {btn2.center_y}, {btn2.center_y}")
+
+       
 
     def update_label_size(self, label, width, height):
         label.font_size = height * 0.02  # Adjust font size based on the height of the window
@@ -633,18 +727,16 @@ class LineWin(Screen):
         self.rect.pos = (0, self.height * 0.9)
         self.rect.size = (self.width, self.height * 0.1)
 
-    def update_line(self, instance, value):
-        scroll_y = self.ids.scroll_view.scroll_y if 'scroll_view' in self.ids else 0
-        self.line.points = [Window.width / 2, 0, Window.width / 2, max(instance.height, Window.height * 0.885)]
-        if 'scroll_view' in self.ids:
-            self.ids.scroll_view.scroll_y = scroll_y
 
-    def update_line_position(self, *args):
-        scroll_y = self.ids.scroll_view.scroll_y if 'scroll_view' in self.ids else 0
-        self.line.points = [self.width / 2, 0, self.width / 2, max(self.line.points[3], self.height)]
-        if 'scroll_view' in self.ids:
-            self.ids.scroll_view.scroll_y = scroll_y
 
+    def update_positions_and_draw_lines(self, *args):
+        self.layoutscroll.do_layout()
+
+        # Explicitly update button positions (ensure they are fully laid out)
+        for btn in self.StationBtns:
+            print(f"Updated button position: {btn.pos}")  # Debugging position output
+            btn.x, btn.y = btn.pos
+        self.update_lines_colors(self.layoutscroll, self.StationBtns, self.rangs)
 
 
     def back_pressed(self,*args):
@@ -660,6 +752,11 @@ class LineWin(Screen):
             sm.remove_widget(screens[len(screens)-1])
             screens.pop()
             
+
+
+
+
+
 
 class StationWin(Screen):
     def __init__(self,nam,rang,adad,esm,**kwargs):
