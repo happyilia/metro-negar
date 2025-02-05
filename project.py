@@ -639,8 +639,17 @@ class LineWin(Screen):
         self.bind(size=self.update_rect, pos=self.update_rect)
         StationBtns=[]
         r=0
+        file_path_intersecs = os.path.join(script_dir, "tehran\\intersections.txt")
+        open_intersecs=open(file_path_intersecs,'r',encoding='utf-8')
+        intersecs=open_intersecs.readlines()
+        k=0
         for i in lines:
-            if self.t:
+            if i in intersecs:
+                
+                StationBtns.append(MDIconButton(rounded_button=True,icon=os.path.join(script_dir, "tehran\\intersecs_pics\\"+str(intersecs.index(i)+1)+".png",pos_hint={"x":0.5})))
+                
+                
+            elif self.t:
                 StationBtns.append( BaseButton(line_width = 10,line_color=rangs[r],rounded_button=True,md_bg_color=(1,1,1,1),pos_hint={"x":0.5}))
             else:
                 StationBtns.append( BaseButton(line_width = 10,line_color=self.rang,rounded_button=True,md_bg_color=(1,1,1,1),pos_hint={"x":0.5}))
@@ -706,8 +715,9 @@ class LineWin(Screen):
 
     def update_lines_colors(self, layoutscroll, StationBtns, rangs):
         layoutscroll.do_layout()
-        # First, update the positions of the buttons (ensure they are fully placed)
-
+        #check kardan mokhtasat button aval
+        for i in StationBtns:
+            print(i.x,'  ',i.y,'\n')
         # Now, draw the lines between the buttons
         with layoutscroll.canvas.before:
             for i in range(len(StationBtns) - 1):
