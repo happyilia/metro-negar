@@ -1,14 +1,17 @@
 from imports import *
 from kivy.core.window import Window
 from kivy.clock import Clock
-
+from kivymd.uix.label.label import MDLabel
 
 script_dir = os.path.dirname(os.path.abspath(__file__))
 kv = Builder.load_file("my.kv")
 Window.clearcolor = (1, 1, 1, 1)
 tehlinecolors = [(1,0,0,1),(0,0,1,1),(0,0.8,1,1),(1,0.89,0,1),(0,0.5,0,1),(1,0.45,0.85,1),(0.65,0,1,1)]
+
 def fa(txt):
     return txt
+def fa2(txt):
+    return get_display(arabic_reshaper.reshape(txt))
 config = Config()
 config.change(
     direction='ltr',
@@ -243,7 +246,7 @@ class TehranLineWin(Screen):
         self.add_widget(self.searchbox)
         self.searchBtn=MDIconButton(pos_hint={'x':0.37,'y':0.8},size_hint=(0.08,0.08),icon="magnify",line_width=5,line_color=(0,0,0,1),rounded_button=True,md_bg_color=(0.75, 0.75, 0.75, 1))
         self.add_widget(self.searchBtn)
-        self.search_results_scroll = ScrollView(size_hint=(0.3, 0), pos_hint={'x':0.01, 'y':0.62})
+        self.search_results_scroll = ScrollView(size_hint=(0.3, 0), pos_hint={'x':0.01, 'y':0.61})
         with self.search_results_scroll.canvas.before:
             Color(1, 1, 1, 1)  # White color
             self.rect = Rectangle(size=self.search_results_scroll.size, pos=self.search_results_scroll.pos)
@@ -258,14 +261,14 @@ class TehranLineWin(Screen):
         self.searchbox.bind(text=self.on_text)
         self.searchBtn.bind(on_press=self.searchBtn_pressed)
 
-        self.inside_footer = FloatLayout(pos_hint={'x': 0, 'y': 0}, size_hint=(1, 0.1))
-        self.footer = GridLayout()
+        self.footer = FloatLayout(pos_hint={'x': 0, 'y': 0}, size_hint=(1, 0.1))
+        
 
-        settingBtn = Button(background_normal="icons8-settings-480.png", background_down='icons8-settings-4802.png')
-        apiMapBtn = Button(background_normal="mapapiicon.png", background_down='mapapiicon2.png')
-        mapBtn = Button(background_normal="mapicon.png", background_down='mapicon2.png')
-        navBtn = Button(background_normal="navicon.png", background_down='navicon2.png')
-        lineBtn = Button(disabled=True, background_disabled_normal="lineicon2.png")
+        settingBtn = MDIconButton(icon="icons8-settings-480.png",pos_hint={'center_x':0.1},icon_size="55sp")
+        apiMapBtn = MDIconButton(icon="mapapiicon.png",pos_hint={'center_x':0.3},icon_size="55sp")
+        mapBtn = MDIconButton(icon="mapicon.png",pos_hint={'center_x':0.9},icon_size="55sp")
+        navBtn = MDIconButton(icon="navicon.png",pos_hint={'center_x':0.7},icon_size="55sp")
+        lineBtn = MDIconButton(disabled=True, icon="lineicon2.png",pos_hint={'center_x':0.5},icon_size="55sp")
         
         self.footer.rows = 1
         self.footer.cols = 5
@@ -275,8 +278,8 @@ class TehranLineWin(Screen):
         self.footer.add_widget(lineBtn)
         self.footer.add_widget(navBtn)
         self.footer.add_widget(mapBtn)
-        self.inside_footer.add_widget(self.footer)
-        self.add_widget(self.inside_footer)
+        
+        self.add_widget(self.footer)
 
         mapBtn.bind(on_press=self.map_pressed)
         apiMapBtn.bind(on_press=self.apimap_pressed)
@@ -340,34 +343,30 @@ class TehranLineWin(Screen):
         sm.current="tehline6"
     def line7_pressed(self, instance):
         sm.current="tehline7"
-    def on_label_touch_down(self, instance, touch):
-        if instance.collide_point(*touch.pos):
-            self.label_selected(instance)
-            return True
-        return False
+    def on_label_touch_down(self, *args):
+        
+        
+        self.searchbox.text = self.ser_labels[-1].text
+        
 
-    def on_touch_down(self, touch):
-        if self.search_results_box.collide_point(*touch.pos):
-            for child in self.search_results_box.children:
-                if child.collide_point(*touch.pos):
-                    self.label_selected(child,touch)
-                    return True  # Propagate touch event to the correct child
-        return super(TehranLineWin, self).on_touch_down(touch)
+    
     def on_text(self, instance, value):
         self.search_results_box.clear_widgets()
+        self.ser_labels=[]
         if value.strip(): 
             matches = self.search_names(value)
             for match in matches:
-                label = Label(text=fa(match), font_size=40, font_name='Vazir-Bold', color="black")
-                label.bind(on_touch_down=self.on_label_touch_down)
-                self.search_results_box.add_widget(label)
+                self.ser_labels.append(Label(text=fa(match), font_size=40, font_name='Vazir-Bold', color="black"))
+                self.adad_ser=matches.index(match)
+                self.ser_labels[-1].bind(on_touch_down=self.on_label_touch_down)
+                self.search_results_box.add_widget(self.ser_labels[-1])
             self.search_results_scroll.size_hint_y = None  
             self.search_results_scroll.height = self.searchbox.height * 2 
         else:
             self.search_results_scroll.size_hint_y = 0
 
-    def label_selected(self, instance):
-        self.searchbox.text = instance.text
+
+        
 
 
     def search_names(self, query):
@@ -380,7 +379,7 @@ class TehranLineWin(Screen):
             
         pattern = re.compile(query, re.IGNORECASE)
         for i in range(1, 8):
-            file_path = os.path.join(script_dir, "tehran", f"line{i}infoplaces.txt")
+            file_path = os.path.join(script_dir, "tehran", f"line{i}infoplacescut.txt")
             with open(file_path, 'r', encoding='utf-8') as file:
                 names.extend([line.strip("، ") for line in file])
             
@@ -400,7 +399,57 @@ class TehranLineWin(Screen):
         self.searchbox.text = ''
 
 class Setting(Screen):
-    pass
+    def __init__(self, **kwargs):
+        super(Setting, self).__init__(**kwargs)
+    def on_kv_post(self, base_widget):
+        with self.canvas.before:
+            self.rect_color = Color(0.4, 0.4, 0.4, 1)
+            self.rect = Rectangle()
+        
+        self.bind(size=self.update_rect, pos=self.update_rect)
+        
+        self.footer = FloatLayout(pos_hint={'x': 0, 'y': 0}, size_hint=(1, 0.1))
+        
+
+        settingBtn = MDIconButton(disabled=True,icon="icons8-settings-480.png",pos_hint={'center_x':0.1},icon_size="55sp")
+        apiMapBtn = MDIconButton(icon="mapapiicon.png",pos_hint={'center_x':0.3},icon_size="55sp")
+        mapBtn = MDIconButton(icon="mapicon.png",pos_hint={'center_x':0.9},icon_size="55sp")
+        navBtn = MDIconButton(icon="navicon.png",pos_hint={'center_x':0.7},icon_size="55sp")
+        lineBtn = MDIconButton(icon="lineicon.png",pos_hint={'center_x':0.5},icon_size="55sp")
+        
+        self.footer.rows = 1
+        self.footer.cols = 5
+
+        self.footer.add_widget(settingBtn)
+        self.footer.add_widget(apiMapBtn)
+        self.footer.add_widget(lineBtn)
+        self.footer.add_widget(navBtn)
+        self.footer.add_widget(mapBtn)
+        
+        self.add_widget(self.footer)
+
+        mapBtn.bind(on_press=self.map_pressed)
+        lineBtn.bind(on_press=self.line_pressed)
+        navBtn.bind(on_press=self.nav_pressed)
+        apiMapBtn.bind(on_press=self.apimap_pressed)
+
+        inside_header = FloatLayout(pos_hint={'x': 0, 'y': 0.9}, size_hint=(1, 0.1))
+        headerLabel = Label(text=fa("تنظیمات"), font_size=50, font_name='Vazir-Bold', color="white", pos_hint={'x': 0, 'y': 0})
+        inside_header.add_widget(headerLabel)
+        self.add_widget(inside_header)
+
+    def update_rect(self, *args): 
+        self.rect.pos = (0, self.height * 0.9) # Adjust position to be 90% down the screen 
+        self.rect.size = (self.width, self.height * 0.1)
+
+    def map_pressed(self, instance):
+        sm.current = "tehranmap"
+    def line_pressed(self, instance):
+        sm.current = "tehranline"
+    def nav_pressed(self, instance):
+        sm.current = "tehrannav"
+    def apimap_pressed(self, instance):
+        sm.current = "tehranapimap"
 class TehranAPIMap(Screen):
     def __init__(self, **kwargs):
         super(TehranAPIMap, self).__init__(**kwargs)
@@ -411,14 +460,14 @@ class TehranAPIMap(Screen):
         
         self.bind(size=self.update_rect, pos=self.update_rect)
         
-        self.inside_footer = FloatLayout(pos_hint={'x': 0, 'y': 0}, size_hint=(1, 0.1))
-        self.footer = GridLayout()
+        self.footer = FloatLayout(pos_hint={'x': 0, 'y': 0}, size_hint=(1, 0.1))
+        
 
-        settingBtn = Button(background_normal="icons8-settings-480.png", background_down='icons8-settings-4802.png')
-        apiMapBtn = Button(disabled=True, background_disabled_normal="mapapiicon2.png")
-        mapBtn = Button(background_normal="mapicon.png", background_down='mapicon2.png')
-        navBtn = Button(background_normal="navicon.png", background_down='navicon2.png')
-        lineBtn = Button(background_normal="lineicon.png", background_down='lineicon2.png')
+        settingBtn = MDIconButton(icon="icons8-settings-480.png",pos_hint={'center_x':0.1},icon_size="55sp")
+        apiMapBtn = MDIconButton(disabled=True,icon="mapapiicon2.png",pos_hint={'center_x':0.3},icon_size="55sp")
+        mapBtn = MDIconButton(icon="mapicon.png",pos_hint={'center_x':0.9},icon_size="55sp")
+        navBtn = MDIconButton(icon="navicon.png",pos_hint={'center_x':0.7},icon_size="55sp")
+        lineBtn = MDIconButton(icon="lineicon.png",pos_hint={'center_x':0.5},icon_size="55sp")
         
         self.footer.rows = 1
         self.footer.cols = 5
@@ -428,8 +477,8 @@ class TehranAPIMap(Screen):
         self.footer.add_widget(lineBtn)
         self.footer.add_widget(navBtn)
         self.footer.add_widget(mapBtn)
-        self.inside_footer.add_widget(self.footer)
-        self.add_widget(self.inside_footer)
+        
+        self.add_widget(self.footer)
 
         mapBtn.bind(on_press=self.map_pressed)
         lineBtn.bind(on_press=self.line_pressed)
@@ -465,14 +514,14 @@ class TehranMap(Screen):
         
         self.bind(size=self.update_rect, pos=self.update_rect)
         
-        self.inside_footer = FloatLayout(pos_hint={'x': 0, 'y': 0}, size_hint=(1, 0.1))
-        self.footer = GridLayout()
+        self.footer = FloatLayout(pos_hint={'x': 0, 'y': 0}, size_hint=(1, 0.1))
+        
 
-        settingBtn = Button(background_normal="icons8-settings-480.png", background_down='icons8-settings-4802.png')
-        apiMapBtn = Button(background_normal="mapapiicon.png", background_down='mapapiicon2.png')
-        mapBtn = Button(disabled=True, background_disabled_normal="mapicon2.png")
-        navBtn = Button(background_normal="navicon.png", background_down='navicon2.png')
-        lineBtn = Button(background_normal="lineicon.png", background_down='lineicon2.png')
+        settingBtn = MDIconButton(icon="icons8-settings-480.png",pos_hint={'center_x':0.1},icon_size="55sp")
+        apiMapBtn = MDIconButton(icon="mapapiicon.png",pos_hint={'center_x':0.3},icon_size="55sp")
+        mapBtn = MDIconButton(disabled=True,icon="mapicon2.png",pos_hint={'center_x':0.9},icon_size="55sp")
+        navBtn = MDIconButton( icon="navicon.png",pos_hint={'center_x':0.7},icon_size="55sp")
+        lineBtn = MDIconButton(icon="lineicon.png",pos_hint={'center_x':0.5},icon_size="55sp")
         
         self.footer.rows = 1
         self.footer.cols = 5
@@ -482,8 +531,8 @@ class TehranMap(Screen):
         self.footer.add_widget(lineBtn)
         self.footer.add_widget(navBtn)
         self.footer.add_widget(mapBtn)
-        self.inside_footer.add_widget(self.footer)
-        self.add_widget(self.inside_footer)
+        
+        self.add_widget(self.footer)
 
         apiMapBtn.bind(on_press=self.mapapi_pressed)
         lineBtn.bind(on_press=self.line_pressed)
@@ -526,14 +575,14 @@ class TehranNav(Screen):
         
         self.bind(size=self.update_rect, pos=self.update_rect)
         
-        self.inside_footer = FloatLayout(pos_hint={'x': 0, 'y': 0}, size_hint=(1, 0.1))
-        self.footer = GridLayout()
+        self.footer = FloatLayout(pos_hint={'x': 0, 'y': 0}, size_hint=(1, 0.1))
+        
 
-        settingBtn = Button(background_normal="icons8-settings-480.png", background_down='icons8-settings-4802.png')
-        apiMapBtn = Button(background_normal="mapapiicon.png", background_down='mapapiicon2.png')
-        mapBtn = Button(background_normal="mapicon.png", background_down='mapicon2.png')
-        navBtn = Button(disabled=True, background_disabled_normal="navicon2.png")
-        lineBtn = Button(background_normal="lineicon.png", background_down='lineicon2.png')
+        settingBtn = MDIconButton(icon="icons8-settings-480.png",pos_hint={'center_x':0.1},icon_size="55sp")
+        apiMapBtn = MDIconButton(icon="mapapiicon.png",pos_hint={'center_x':0.3},icon_size="55sp")
+        mapBtn = MDIconButton(icon="mapicon.png",pos_hint={'center_x':0.9},icon_size="55sp")
+        navBtn = MDIconButton(disabled=True, icon="navicon2.png",pos_hint={'center_x':0.7},icon_size="55sp")
+        lineBtn = MDIconButton(icon="lineicon.png",pos_hint={'center_x':0.5},icon_size="55sp")
         
         self.footer.rows = 1
         self.footer.cols = 5
@@ -543,8 +592,8 @@ class TehranNav(Screen):
         self.footer.add_widget(lineBtn)
         self.footer.add_widget(navBtn)
         self.footer.add_widget(mapBtn)
-        self.inside_footer.add_widget(self.footer)
-        self.add_widget(self.inside_footer)
+        
+        self.add_widget(self.footer)
 
         apiMapBtn.bind(on_press=self.mapapi_pressed)
         lineBtn.bind(on_press=self.line_pressed)
@@ -583,18 +632,18 @@ class TehranNav(Screen):
     def setting_pressed(self, instance):
         sm.current = "setting"
     def search_pressed(self,screens, instance):
-        
-        path=BFS_SP(teh_graph, self.mabdaTextinp.text, self.maghsadTextinp.text)
-        
-        adads=line_finder(path)
-        
-        
-        screens.append(LineWin(name="search", esm="tehran\\line" + str(1) + ".txt", adad=adads,rang=(1,1,1,1), t=True,stations=path))
+        if self.mabdaTextinp.text!='' and self.maghsadTextinp.text!='' and finder(self.mabdaTextinp.text)!=False and finder(self.maghsadTextinp.text)!=False:
+            path=BFS_SP(teh_graph, self.mabdaTextinp.text, self.maghsadTextinp.text)
+            
+            adads=line_finder(path)
+            
+            
+            screens.append(LineWin(name="search", esm="tehran\\line" + str(1) + ".txt", adad=adads,rang=(1,1,1,1), t=True,stations=path))
 
-        sm.add_widget(screens[len(screens)-1])
-        sm.current="search"
-        self.mabdaTextinp.text=''
-        self.maghsadTextinp.text=''
+            sm.add_widget(screens[len(screens)-1])
+            sm.current="search"
+            self.mabdaTextinp.text=''
+            self.maghsadTextinp.text=''
 
 class LineWin(Screen):
     def __init__(self, esm,adad,rang,t,stations, **kwargs):
@@ -635,24 +684,28 @@ class LineWin(Screen):
             besamt=lines[len(lines)-1]
                 
         layoutscroll = GridLayout(cols=1, spacing=70, size_hint=(1,None))
-        root = ScrollView(size_hint=(1, None), size=(Window.width, Window.height * 0.885))
+        self.root = ScrollView(size_hint=(1, None), size=(Window.width, Window.height * 0.885))
         self.bind(size=self.update_rect, pos=self.update_rect)
         StationBtns=[]
         r=0
         file_path_intersecs = os.path.join(script_dir, "tehran\\intersections.txt")
         open_intersecs=open(file_path_intersecs,'r',encoding='utf-8')
-        intersecs=open_intersecs.readlines()
+        intersecs=open_intersecs.read().split('\n')
         k=0
+        self.inters=[]
         for i in lines:
             if i in intersecs:
                 
-                StationBtns.append(MDIconButton(rounded_button=True,icon=os.path.join(script_dir, "tehran\\intersecs_pics\\"+str(intersecs.index(i)+1)+".png",pos_hint={"x":0.5})))
-                
+                StationBtns.append(MDIconButton(rounded_button=False,icon=os.path.join(script_dir, "tehran\\intersecs_pics\\"+str(intersecs.index(i)+1)+".png"),pos_hint={'center_x':0.7},icon_size="42sp"))
+                StationBtns[-1].pos_hint = {'center_x': 0.505, 'center_y': 0.5}
+                self.inters.append(i)
                 
             elif self.t:
-                StationBtns.append( BaseButton(line_width = 10,line_color=rangs[r],rounded_button=True,md_bg_color=(1,1,1,1),pos_hint={"x":0.5}))
+                StationBtns.append( BaseButton(line_width = 10,line_color=rangs[r],rounded_button=True,md_bg_color=(1,1,1,1)))
+                StationBtns[-1].pos_hint = {'center_x': 0.5, 'center_y': 0.5}
             else:
-                StationBtns.append( BaseButton(line_width = 10,line_color=self.rang,rounded_button=True,md_bg_color=(1,1,1,1),pos_hint={"x":0.5}))
+                StationBtns.append( BaseButton(line_width = 10,line_color=self.rang,rounded_button=True,md_bg_color=(1,1,1,1)))
+                StationBtns[-1].pos_hint = {'center_x': 0.5, 'center_y': 0.5}
 
             label = Label(text=i, size_hint=(None, None), color="black", font_name="Vazir", font_size=47)
 
@@ -661,8 +714,8 @@ class LineWin(Screen):
                 xlabel = 0.7
             else:
                 xlabel = 0.2
-
-            StationBtns[-1].pos_hint = {'center_x': 0.5, 'center_y': 0.5}
+            
+            
             label.pos_hint = {'x': xlabel, 'center_y': 0.1}
             float_layout.add_widget(StationBtns[-1])
             float_layout.add_widget(label)
@@ -683,51 +736,72 @@ class LineWin(Screen):
             with self.canvas.before:
                 self.rect_color = Color(0.5,0.5,0.5,1)
                 self.rect = Rectangle()
-        root.add_widget(layoutscroll)
-        self.add_widget(root)
+        self.root.add_widget(layoutscroll)
+        self.add_widget(self.root)
 
         inside_header = RelativeLayout(size_hint=(1, 0.1), pos_hint={'top': 1})
         if self.t:
             adads=''
-            besamts=''
+            self.besamts=''
             for i in self.adad:
                 adads+=str(i)+' و '
             for i in besamt:
-                besamts+=i+' و '
-            headertext="خط "+ adads[:len(adads)-3] + " به سمت: " + besamts[:len(besamts)-3]
+                self.besamts+=i+' ، '
+            headertext="خطوط "+ adads[:len(adads)-3] 
         else:
             headertext="خط "+str(self.adad) +" به سمت: "+besamt
         headerLabel = Label(text=headertext, font_size=50, font_name='Vazir-Bold', 
                             color="white", pos_hint={'x': 0, 'y': 0})
         inside_header.add_widget(headerLabel)
         self.add_widget(inside_header)
+        self.info_layout = FloatLayout(size_hint=(0.2, 0.1), pos_hint={'x': 0.8, 'y':0.1})
+        self.infoBtn = MDIconButton(rounded_button=False,icon=os.path.join(script_dir, "more-info-icon.png"),icon_size="42sp",pos_hint={'center_x':0.5})
+        self.info_layout.add_widget(self.infoBtn)
+        self.infoBtn.bind(on_press=self.info_pressed)
+        self.add_widget(self.info_layout)
 
         self.back_layout = FloatLayout(size_hint=(0.2, 0.1), pos_hint={'x': 0.05, 'top': 1}) 
-        backBtn = Button(background_normal="back.png", background_down="back.png") 
+        backBtn = MDIconButton(icon="back.png", icon_size="42sp") 
         self.back_layout.add_widget(backBtn) 
         self.add_widget(self.back_layout)
         backBtn.bind(on_press=self.back_pressed)
         layoutscroll.bind(minimum_height=layoutscroll.setter('height'))
+        self.bind(size=self.layout_update)
         self.StationBtns = StationBtns
         self.layoutscroll = layoutscroll
         self.rangs = rangs
-        Clock.schedule_once(self.update_positions_and_draw_lines, 0.1)
+        self.bind(size=lambda instance,idx=self.layoutscroll: self.clearing_canvas_2(idx))
+        Clock.schedule_interval(self.line_update, 0.1)
+        
+        
+    
+
+    def clearing_canvas_2(self,layoutscroll,*args):
+        self.clearing_canvas(self.layoutscroll)
+    def clearing_canvas(self,layoutscroll,*args):
+        layoutscroll.canvas.before.clear()
+
 
     def update_lines_colors(self, layoutscroll, StationBtns, rangs):
-        layoutscroll.do_layout()
-        #check kardan mokhtasat button aval
-        for i in StationBtns:
-            print(i.x,'  ',i.y,'\n')
+        
+        
+        layoutscroll.canvas.before.clear()
         # Now, draw the lines between the buttons
         with layoutscroll.canvas.before:
-            for i in range(len(StationBtns) - 1):
+            Color(*rangs[0])
+            Line(points=[self.center_x, StationBtns[1].center_y+StationBtns[1].center_y/10, self.center_x, StationBtns[1].center_y], width=10)
+            
+            for i in range(1,len(StationBtns) - 1):
                 btn1 = StationBtns[i]
                 btn2 = StationBtns[i + 1]
                 Color(*rangs[i])
-                Line(points=[btn1.center_x, btn1.center_y, btn2.center_x, btn2.center_y], width=10)
-                print(f"Drawing line from {btn1.center_x}, {btn1.center_y} to {btn2.center_y}, {btn2.center_y}")
+                Line(points=[self.center_x, btn1.center_y, self.center_x, btn2.center_y], width=10)
+                
 
-       
+    def line_update(self,*args):
+        self.StationBtns = [[self.width*0.5,self.height*2.25]]+self.StationBtns[1:]
+        
+        self.update_positions_and_draw_lines()
 
     def update_label_size(self, label, width, height):
         label.font_size = height * 0.02  # Adjust font size based on the height of the window
@@ -737,15 +811,14 @@ class LineWin(Screen):
         self.rect.pos = (0, self.height * 0.9)
         self.rect.size = (self.width, self.height * 0.1)
 
-
+    def layout_update(self,*args):
+        self.root.height=self.height*0.885
 
     def update_positions_and_draw_lines(self, *args):
         self.layoutscroll.do_layout()
 
         # Explicitly update button positions (ensure they are fully laid out)
-        for btn in self.StationBtns:
-            print(f"Updated button position: {btn.pos}")  # Debugging position output
-            btn.x, btn.y = btn.pos
+        
         self.update_lines_colors(self.layoutscroll, self.StationBtns, self.rangs)
 
 
@@ -762,8 +835,21 @@ class LineWin(Screen):
             sm.remove_widget(screens[len(screens)-1])
             screens.pop()
             
-
-
+    def info_pressed(self,*args):
+        if self.t:
+            s=""
+            for i in self.inters[:len(self.inters)-1]:
+                s+=i + "، "
+            if self.inters==[]:
+                txt=''
+            else:
+                txt="در ایستگاه های "+s+self.inters[-1]+" به سمت "+self.besamts[:len(self.besamts)-3]+ " خط عوض کنید."
+            popup=Popup(title=fa(txt),size_hint=(1,0.2),pos_hint={'center_x':0.5,'center_y':0.5})
+            popup.open()
+        else:
+            popup=Popup(title=fa("زمانبندی حرکت قطار ها"),size_hint=(1,0.6),pos_hint={'center_x':0.5,'center_y':0.5})
+            popup.add_widget(Image(source=os.path.join(script_dir, "tehran\\headway_pics\\"+self.adad+".jpg")))
+            popup.open()
 
 
 
