@@ -1,8 +1,11 @@
 from imports import *
+
 from kivy.core.window import Window
 from kivy.clock import Clock
 from kivymd.uix.label.label import MDLabel
 import heapq
+from functools import partial
+from kivy.garden.mapview import MapView
 
 script_dir = os.path.dirname(os.path.abspath(__file__))
 kv = Builder.load_file("my.kv")
@@ -130,7 +133,8 @@ class Node:
       self.d=float('inf') #current distance from source node
       self.parent=None
       self.finished=False
-
+teh_graph['میدان جهاد']['میدان ولیعصر']=10000000
+print(teh_graph)
 
 
 
@@ -372,23 +376,31 @@ class TehranLineWin(Screen):
         sm.current="tehline6"
     def line7_pressed(self, instance):
         sm.current="tehline7"
-    def on_label_touch_down(self, *args):
+    # def on_label_touch_down(self, instance, touch, match):
+    #     print(instance)
+    #     self.searchbox.text = self.ser_labels[instance].text
+    def on_label_touch_down(self, instance, touch, match):
         
-        
-        self.searchbox.text = self.ser_labels[-1].text
-        
+        if touch.collide_point(*touch.pos):  # Ensure touch is on the label
+            print(f"Label clicked with text: {instance}")   
+            return True
+        return False 
 
     
     def on_text(self, instance, value):
         self.search_results_box.clear_widgets()
-        self.ser_labels=[]
+        self.ser_labels = []
+        
         if value.strip(): 
             matches = self.search_names(value)
             for match in matches:
-                self.ser_labels.append(Label(text=fa(match), font_size=30, font_name='Vazir-Bold', color="black"))
-                self.adad_ser=matches.index(match)
-                self.ser_labels[-1].bind(on_touch_down=self.on_label_touch_down)
-                self.search_results_box.add_widget(self.ser_labels[-1])
+                label = Label(text=fa(match), font_size=30, font_name='Vazir-Bold', color="black")
+                
+                # Bind the touch event properly using partial
+                label.bind(on_touch_down=partial(self.on_label_touch_down, match))
+                self.ser_labels.append(label)
+                self.search_results_box.add_widget(label)
+
             self.search_results_scroll.size_hint_y = None  
             self.search_results_scroll.height = self.searchbox.height * 2 
         else:
@@ -489,6 +501,16 @@ class TehranAPIMap(Screen):
         
         self.bind(size=self.update_rect, pos=self.update_rect)
         
+        map_layout=FloatLayout(pos_hint={'x': 1, 'y': 0.9}, size_hint=(1, 0.9))
+
+        self.map=MapView(zoom=11, lat=50.6394, lon=3.057,map_source="osm" )
+        map_layout.add_widget(self.map)
+        self.add_widget(map_layout)
+
+
+
+
+
         self.footer = FloatLayout(pos_hint={'x': 0, 'y': 0}, size_hint=(1, 0.1))
         
 
