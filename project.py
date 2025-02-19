@@ -2,6 +2,7 @@ from imports import *
 from kivy.core.window import Window
 from kivy.clock import Clock
 from kivymd.uix.label.label import MDLabel
+import heapq
 
 script_dir = os.path.dirname(os.path.abspath(__file__))
 kv = Builder.load_file("my.kv")
@@ -22,24 +23,42 @@ config.change(
     # file_bolditalic='{path}.ttf'
 )
 
-def BFS_SP(graph, start, goal):
-    explored = []
-    queue = [[start]]
-    if start == goal:
-        return
+
+def dijkstra_with_total_weight(graph, start, end):
+    # Create a priority queue and hash set to store visited nodes
+    queue = [(0, start)]
+    visited = set()
+    distances = {start: 0}
+    parents = {start: None}
+
     while queue:
-        path = queue.pop(0)
-        node = path[-1]
-        if node not in explored:
-            neighbours = graph[node]
-            for neighbour in neighbours:
-                new_path = list(path)
-                new_path.append(neighbour)
-                queue.append(new_path)
-                if neighbour == goal:
-                    return new_path
-            explored.append(node)
-    return
+        (current_distance, current_node) = heapq.heappop(queue)
+
+        if current_node in visited:
+            continue
+
+        visited.add(current_node)
+
+        if current_node == end:
+            break
+
+        for neighbor, weight in graph[current_node].items():
+            distance = current_distance + weight
+            if neighbor not in distances or distance < distances[neighbor]:
+                distances[neighbor] = distance
+                heapq.heappush(queue, (distance, neighbor))
+                parents[neighbor] = current_node
+
+    path = []
+    total_weight = 0
+    while end is not None:
+        path.append(end)
+        parent = parents[end]
+        if parent is not None:
+            total_weight += graph[parent][end]
+        end = parent
+    path.reverse()
+    return path, total_weight
 
 def finder(txt):
     
@@ -90,18 +109,28 @@ for i in range(1,8):
     linetxt = linetxt.split('\n')
     for j in range(len(linetxt)):
         if linetxt[j] not in teh_stations and j!=0 and j!=len(linetxt)-1:
-            teh_graph[linetxt[j]]={linetxt[j+1],linetxt[j-1]}
-            
+            teh_graph[linetxt[j]] = {}
+            teh_graph[linetxt[j]][linetxt[j+1]]=5
+            teh_graph[linetxt[j]][linetxt[j-1]]=5
             teh_stations.append(linetxt[j])
         elif j==0:
-            teh_graph[linetxt[j]]={linetxt[j+1]}
+            teh_graph[linetxt[j]] = {}
+            teh_graph[linetxt[j]][linetxt[j + 1]] = 5
             teh_stations.append(linetxt[j])
         elif j==len(linetxt)-1:
-            teh_graph[linetxt[j]]={linetxt[j-1]}
+            teh_graph[linetxt[j]] = {}
+            teh_graph[linetxt[j]][linetxt[j-1]]=5
             
             teh_stations.append(linetxt[j])
         elif linetxt[j] in teh_stations:
-            teh_graph[linetxt[j]].update({linetxt[j+1],linetxt[j-1]})
+            teh_graph[linetxt[j]].update({linetxt[j+1]:5,linetxt[j-1]:5})
+
+class Node:
+  def __init__(self,x_coord,y_coord):
+      self.d=float('inf') #current distance from source node
+      self.parent=None
+      self.finished=False
+
 
 
 
@@ -242,7 +271,7 @@ class TehranLineWin(Screen):
             self.linelabel2 = Label(text=fa(clean_text),font_size = 40, font_name='Vazir-Bold' ,color="black",pos_hint = {'center_x':xlabel , 'y':i-0.5})
             self.add_widget(self.linelabel2)
         
-        self.searchbox=TextInput(pos_hint={'x':0.01,'y':0.8},size_hint=(0.3,0.08),hint_text=fa("نام ایستگاه/مکان"),hint_text_color=(0.4, 0.4, 0.4, 1),font_name='Vazir',background_color="white",border=(4,4,4,4),base_direction='rtl',font_context='Vazir',text_language='fa')
+        self.searchbox=TextInput(pos_hint={'x':0.01,'y':0.8},size_hint=(0.3,0.08),hint_text=fa("نام ایستگاه/مکان"),hint_text_color=(0.4, 0.4, 0.4, 1),font_name='Vazir',background_color="white",border=(4,4,4,4),base_direction='rtl',font_context='Vazir',text_language='fa',font_size=30)
         self.add_widget(self.searchbox)
         self.searchBtn=MDIconButton(pos_hint={'x':0.37,'y':0.8},size_hint=(0.08,0.08),icon="magnify",line_width=5,line_color=(0,0,0,1),rounded_button=True,md_bg_color=(0.75, 0.75, 0.75, 1))
         self.add_widget(self.searchBtn)
@@ -356,7 +385,7 @@ class TehranLineWin(Screen):
         if value.strip(): 
             matches = self.search_names(value)
             for match in matches:
-                self.ser_labels.append(Label(text=fa(match), font_size=40, font_name='Vazir-Bold', color="black"))
+                self.ser_labels.append(Label(text=fa(match), font_size=30, font_name='Vazir-Bold', color="black"))
                 self.adad_ser=matches.index(match)
                 self.ser_labels[-1].bind(on_touch_down=self.on_label_touch_down)
                 self.search_results_box.add_widget(self.ser_labels[-1])
@@ -411,7 +440,7 @@ class Setting(Screen):
         self.footer = FloatLayout(pos_hint={'x': 0, 'y': 0}, size_hint=(1, 0.1))
         
 
-        settingBtn = MDIconButton(disabled=True,icon="icons8-settings-480.png",pos_hint={'center_x':0.1},icon_size="55sp")
+        settingBtn = MDIconButton(disabled=True,icon="icons8-settings-4802.png",pos_hint={'center_x':0.1},icon_size="55sp")
         apiMapBtn = MDIconButton(icon="mapapiicon.png",pos_hint={'center_x':0.3},icon_size="55sp")
         mapBtn = MDIconButton(icon="mapicon.png",pos_hint={'center_x':0.9},icon_size="55sp")
         navBtn = MDIconButton(icon="navicon.png",pos_hint={'center_x':0.7},icon_size="55sp")
@@ -633,7 +662,7 @@ class TehranNav(Screen):
         sm.current = "setting"
     def search_pressed(self,screens, instance):
         if self.mabdaTextinp.text!='' and self.maghsadTextinp.text!='' and finder(self.mabdaTextinp.text)!=False and finder(self.maghsadTextinp.text)!=False:
-            path=BFS_SP(teh_graph, self.mabdaTextinp.text, self.maghsadTextinp.text)
+            path,total_weight=dijkstra_with_total_weight(teh_graph, self.mabdaTextinp.text, self.maghsadTextinp.text)
             
             adads=line_finder(path)
             
@@ -694,7 +723,7 @@ class LineWin(Screen):
         k=0
         self.inters=[]
         for i in lines:
-            if i in intersecs:
+            if i in intersecs :
                 
                 StationBtns.append(MDIconButton(rounded_button=False,icon=os.path.join(script_dir, "tehran\\intersecs_pics\\"+str(intersecs.index(i)+1)+".png"),pos_hint={'center_x':0.7},icon_size="42sp"))
                 StationBtns[-1].pos_hint = {'center_x': 0.505, 'center_y': 0.5}
