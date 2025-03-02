@@ -1,11 +1,6 @@
 from imports import *
 
-from kivy.core.window import Window
-from kivy.clock import Clock
-from kivymd.uix.label.label import MDLabel
-import heapq
-from functools import partial
-from kivy.garden.mapview import MapView
+
 
 script_dir = os.path.dirname(os.path.abspath(__file__))
 kv = Builder.load_file("my.kv")
@@ -133,8 +128,7 @@ class Node:
       self.d=float('inf') #current distance from source node
       self.parent=None
       self.finished=False
-teh_graph['میدان جهاد']['میدان ولیعصر']=10000000
-print(teh_graph)
+
 
 
 
@@ -151,41 +145,52 @@ class WelcomeWindow(Screen):
     def __init__(self,**kwargs):
         super(WelcomeWindow,self).__init__(**kwargs)
         self.rows = 3
-
+        with self.canvas.before:
+            self.rect_color = Color(0.4, 0.4, 0.4, 1)
+            self.top_rect = Rectangle()
+            Color(0.5, 0.5, 0.5, 1)
+            self.circle=Ellipse(radius=1000)
+        inside_header = FloatLayout(pos_hint={'x': 0, 'y': 0.9}, size_hint=(1, 0.1))
+        headerLabel = Label(text=fa("خوش آمدید! "), font_size=50, font_name='Vazir-Bold', color="white", pos_hint={'x': 0, 'y': 0})
+        inside_header.add_widget(headerLabel)
+        self.add_widget(inside_header)
+        self.bind(size=self.update_rect, pos=self.update_rect)
         self.inside = GridLayout()
         self.inside.cols = 1
-        self.inside.rows = 3
-        self.insidebtn = GridLayout()
-        self.insidebtn.cols = 3
-        self.insidebtn.rows = 2
+        self.inside.rows = 2
+        self.inside2 = GridLayout()
+        self.inside2.cols = 1
+        self.inside2.rows = 1
+        self.insidebtn = MDCircularLayout(degree_spacing=60,start_from=90,pos_hint={'center_x':.5,'center_y':.5},circular_radius=300)
 
-        self.inside.add_widget(Label(text=fa("خوش آمدید! "),font_size = 50, font_name='Vazir-Bold' ,color="black"))
-        self.inside.add_widget(Label(text=fa("لطفا شهر خود را انتخاب کنید: "),font_size = 40, font_name='Vazir',color="black") )
+        
+        self.inside2.add_widget(Label(text=fa("لطفا شهر خود را انتخاب کنید: "),font_size = 60, font_name='Vazir',color="black") )
 
-        self.tehran_btn = Button(text=fa('تهران'), font_size=40,font_name='Vazir',background_color="red")
+        self.tehran_btn = MDIconButton(icon="tehranlogo.png",icon_size="55sp")
         self.tehran_btn.bind(on_press=self.pressedtbtn)
         self.insidebtn.add_widget(self.tehran_btn)
 
-        self.mashhad_btn = Button(text=fa('مشهد'), font_size=40,font_name='Vazir',background_color="green")
+        self.mashhad_btn = MDIconButton(icon="mashhadlogo.png",icon_size="55sp")
         self.mashhad_btn.bind(on_press=self.pressed)
         self.insidebtn.add_widget(self.mashhad_btn)
 
-        self.isfahan_btn = Button(text=fa('اصفهان'), font_size=40,font_name='Vazir',background_color="yellow")
+        self.isfahan_btn = MDIconButton(icon="isfahanlogo.png",icon_size="55sp")
         self.isfahan_btn.bind(on_press=self.pressed)
         self.insidebtn.add_widget(self.isfahan_btn)
 
-        self.shiraz_btn = Button(text=fa('شیراز'), font_size=40,font_name='Vazir',background_color="blue")
+        self.shiraz_btn = MDIconButton(icon="shirazlogo.png",icon_size="55sp")
         self.shiraz_btn.bind(on_press=self.pressed)
         self.insidebtn.add_widget(self.shiraz_btn)
 
-        self.tabriz_btn = Button(text=fa('تبریز'), font_size=40,font_name='Vazir',background_color="pink")
+        self.tabriz_btn = MDIconButton(icon="tabrizlogo.png",icon_size="55sp")
         self.tabriz_btn.bind(on_press=self.pressed)
         self.insidebtn.add_widget(self.tabriz_btn)
 
-        self.karaj_btn = Button(text=fa('کرج'), font_size=40,font_name='Vazir',background_color="gray")
+        self.karaj_btn = MDIconButton(icon="karajlogo.png",icon_size="55sp")
         self.karaj_btn.bind(on_press=self.pressed)
         self.insidebtn.add_widget(self.karaj_btn)
 
+        self.inside.add_widget(self.inside2)
         self.inside.add_widget(self.insidebtn)
         self.add_widget(self.inside)
 
@@ -193,6 +198,13 @@ class WelcomeWindow(Screen):
         sm.current = "tehranline"
     def pressed(self, intance):
         print("pressed")
+
+    def update_rect(self, *args): 
+        self.top_rect.pos = (0, self.height * 0.9) 
+        self.top_rect.size = (self.width, self.height * 0.1)
+        self.circle.pos= (self.width*0.5-450,self.height*0.01)
+        
+        self.circle.size=(900,900)
 class TehranLineWin(Screen):
     def __init__(self, **kwargs):
         super(TehranLineWin, self).__init__(**kwargs)
@@ -277,7 +289,7 @@ class TehranLineWin(Screen):
         
         self.searchbox=TextInput(pos_hint={'x':0.01,'y':0.8},size_hint=(0.3,0.08),hint_text=fa("نام ایستگاه/مکان"),hint_text_color=(0.4, 0.4, 0.4, 1),font_name='Vazir',background_color="white",border=(4,4,4,4),base_direction='rtl',font_context='Vazir',text_language='fa',font_size=30)
         self.add_widget(self.searchbox)
-        self.searchBtn=MDIconButton(pos_hint={'x':0.37,'y':0.8},size_hint=(0.08,0.08),icon="magnify",line_width=5,line_color=(0,0,0,1),rounded_button=True,md_bg_color=(0.75, 0.75, 0.75, 1))
+        self.searchBtn=MDIconButton(pos_hint={'x':0.35,'y':0.8},size_hint=(0.08,0.08),icon="magnify",line_width=5,line_color=(0,0,0,1),rounded_button=True,md_bg_color=(0.75, 0.75, 0.75, 1))
         self.add_widget(self.searchBtn)
         self.search_results_scroll = ScrollView(size_hint=(0.3, 0), pos_hint={'x':0.01, 'y':0.61})
         with self.search_results_scroll.canvas.before:
@@ -501,9 +513,11 @@ class TehranAPIMap(Screen):
         
         self.bind(size=self.update_rect, pos=self.update_rect)
         
-        map_layout=FloatLayout(pos_hint={'x': 1, 'y': 0.9}, size_hint=(1, 0.9))
+        map_layout=FloatLayout( size_hint=(1, 0.8))
 
-        self.map=MapView(zoom=11, lat=50.6394, lon=3.057,map_source="osm" )
+        self.map=MapView(zoom=11, lat=35.715298, lon= 51.404343,pos=(0,Window.height*0.1))
+        
+        self.map.map_source="osm"
         map_layout.add_widget(self.map)
         self.add_widget(map_layout)
 
@@ -555,10 +569,27 @@ class TehranAPIMap(Screen):
         sm.current = "setting"
 
 
+
 class TehranMap(Screen):
     def __init__(self, **kwargs):
         super(TehranMap, self).__init__(**kwargs)
     def on_kv_post(self, base_widget):
+        
+        
+        file_path = os.path.join(script_dir, "tehran\\map.png")
+        self.Grid=FloatLayout(size_hint=(1,.8))
+        self.add_widget(self.Grid)
+        self.stencil=StencilView(pos=(0,Window.height*0.1))
+        self.Grid.add_widget(self.stencil)
+        self.scatter=Scatter(do_translation=True,do_rotation=False,size=(Window.width,Window.height*0.8),pos=(0,Window.height*0.1),scale_min=1)
+        self.stencil.add_widget(self.scatter)
+        self.image=AsyncImage(source=file_path,size=(Window.width,Window.height*0.8))
+        self.scatter.add_widget(self.image)
+
+        self.bind(size=self.update_img, pos=self.update_img)
+        
+
+
         with self.canvas.before:
             self.rect_color = Color(0.4, 0.4, 0.4, 1)
             self.rect = Rectangle()
@@ -595,17 +626,19 @@ class TehranMap(Screen):
         inside_header.add_widget(headerLabel)
         self.add_widget(inside_header)
 
-        file_path = os.path.join(script_dir, "tehran\\map.png")
-        self.Grid=GridLayout(pos_hint={'center_x':.5,'center_y':.5},size_hint=(1,0.8),rows=1,cols=1)
-        self.scatter=Scatter(do_translation=False,do_rotation=False,pos_hint={'center_x':.5,'center_y':.5},size_hint=(1,1),scale_min=1)
-        self.Grid.add_widget(Image(source=file_path,size_hint=(1,1),pos_hint={'center_x':.5,'center_y':.5}))
-        
-        self.add_widget(self.Grid)
 
 
     def update_rect(self, *args): 
         self.rect.pos = (0, self.height * 0.9) # Adjust position to be 90% down the screen 
         self.rect.size = (self.width, self.height * 0.1)
+
+    def update_img(self, *args): 
+        self.Grid.size_hint=(1,.8)
+        self.stencil.pos=(0,Window.height*0.1)
+        self.scatter.size=(Window.width,Window.height*0.8)
+        self.scatter.pos=(0,Window.height*0.1)
+        self.image.size=(Window.width,Window.height*0.8)
+
 
     def mapapi_pressed(self, instance):
         sm.current = "tehranapimap"
