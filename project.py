@@ -6,6 +6,8 @@ script_dir = os.path.dirname(os.path.abspath(__file__))
 kv = Builder.load_file("my.kv")
 Window.clearcolor = (1, 1, 1, 1)
 tehlinecolors = [(1,0,0,1),(0,0,1,1),(0,0.8,1,1),(1,0.89,0,1),(0,0.5,0,1),(1,0.45,0.85,1),(0.65,0,1,1)]
+theme=(1,1,1,1)
+
 
 def fa(txt):
     return txt
@@ -129,7 +131,17 @@ class Node:
       self.parent=None
       self.finished=False
 
+class SettingManager(EventDispatcher):
+    color = ListProperty([0, 0, 0, 1])
+    colorhead= ListProperty([1,1,1,1])
+    best_route = StringProperty("time")
+    fonthead=StringProperty('Vazir-Bold')
+    font=StringProperty('Vazir')
 
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+
+setting_manager = SettingManager()
 
 
 
@@ -146,13 +158,16 @@ class WelcomeWindow(Screen):
         super(WelcomeWindow,self).__init__(**kwargs)
         self.rows = 3
         with self.canvas.before:
-            self.rect_color = Color(0.4, 0.4, 0.4, 1)
+            self.rect_color = Color(0.5, 0.5, 0.5, 1)
             self.top_rect = Rectangle()
+            self.rect_color2 = Color(0.7, 0.7, 0.7,1)
+            self.rect2 = Rectangle()
             Color(0.5, 0.5, 0.5, 1)
             self.circle=Ellipse(radius=1000)
         inside_header = FloatLayout(pos_hint={'x': 0, 'y': 0.9}, size_hint=(1, 0.1))
-        headerLabel = Label(text=fa("خوش آمدید! "), font_size=50, font_name='Vazir-Bold', color="white", pos_hint={'x': 0, 'y': 0})
-        inside_header.add_widget(headerLabel)
+        self.headerLabel = Label(text=fa("خوش آمدید! "), font_size=50, font_name=setting_manager.fonthead, color=setting_manager.colorhead, pos_hint={'x': 0, 'y': 0})
+        
+        inside_header.add_widget(self.headerLabel)
         self.add_widget(inside_header)
         self.bind(size=self.update_rect, pos=self.update_rect)
         self.inside = GridLayout()
@@ -163,8 +178,10 @@ class WelcomeWindow(Screen):
         self.inside2.rows = 1
         self.insidebtn = MDCircularLayout(degree_spacing=60,start_from=90,pos_hint={'center_x':.5,'center_y':.5},circular_radius=300)
 
-        
-        self.inside2.add_widget(Label(text=fa("لطفا شهر خود را انتخاب کنید: "),font_size = 60, font_name='Vazir',color="black") )
+        self.label1=Label(text=fa("لطفا شهر خود را انتخاب کنید: "),font_size = 60, font_name=setting_manager.font,color=setting_manager.color)
+        self.inside2.add_widget(self.label1)
+        setting_manager.bind(color=self.update_color)
+        setting_manager.bind(font=self.update_font)
 
         self.tehran_btn = MDIconButton(icon="tehranlogo.png",icon_size="55sp")
         self.tehran_btn.bind(on_press=self.pressedtbtn)
@@ -202,9 +219,20 @@ class WelcomeWindow(Screen):
     def update_rect(self, *args): 
         self.top_rect.pos = (0, self.height * 0.9) 
         self.top_rect.size = (self.width, self.height * 0.1)
+        self.rect2.pos = (0, 0) # Adjust position to be 90% down the screen 
+        self.rect2.size = (self.width, self.height * 0.1)
         self.circle.pos= (self.width*0.5-450,self.height*0.01)
         
         self.circle.size=(900,900)
+
+    def update_color(self, instance, value):
+        self.label1.color = value
+    def update_colorhead(self, instance, value):
+        self.headerLabel.color = value
+    def update_fonthead(self, instance, value):
+        self.headerLabel.font_name = value
+    def update_font(self, instance, value):
+        self.label1.font_name = value
 class TehranLineWin(Screen):
     def __init__(self, **kwargs):
         super(TehranLineWin, self).__init__(**kwargs)
@@ -212,8 +240,10 @@ class TehranLineWin(Screen):
     def on_kv_post(self, base_widget):
 
         with self.canvas.before:
-            self.rect_color = Color(0.4, 0.4, 0.4, 1)
+            self.toprect_color = Color(0.5, 0.5, 0.5, 1)
             self.top_rect = Rectangle()
+            self.rect_color2 = Color(0.7, 0.7, 0.7,1)
+            self.rect2 = Rectangle()
         
         with self.canvas:
             Color(1, 0, 0, 1) 
@@ -268,7 +298,8 @@ class TehranLineWin(Screen):
         self.bind(size=self.update_rect, pos=self.update_rect)
         self.bind(size=self.update_line_position, pos=self.update_line_position) 
         line1Btn.bind(pos=self.update_line_position)
-        
+        self.linelabels1=[]
+        self.linelabels2=[]
         j=0
         for i in (0.8,0.6875,0.5750,0.4625,0.35,0.2375,0.125):
             j+=1
@@ -278,16 +309,25 @@ class TehranLineWin(Screen):
                 xlabel=0.3
             file_path = os.path.join(script_dir, "tehran\\line"+str(j)+".txt")
             linetxt= open(file_path,'r', encoding='utf-8')
-            self.linelabel = Label(text=fa("خط "+str(j)),font_size = 40, font_name='Vazir-Bold' ,color="black",pos_hint = {'center_x':xlabel , 'y':i-0.45})
+            self.linelabel = Label(text=fa("خط "+str(j)),font_size = 40, font_name=setting_manager.fonthead ,color=setting_manager.color,pos_hint = {'center_x':xlabel , 'y':i-0.45})
+            self.linelabels1.append(self.linelabel)
             self.add_widget(self.linelabel)
             taj=linetxt.readlines()[0]+' '
             linetxt= open(file_path,'r', encoding='utf-8')
             text=taj+"- "+linetxt.readlines()[len(linetxt.readlines())-1]
             clean_text = text.replace("\n","")
-            self.linelabel2 = Label(text=fa(clean_text),font_size = 40, font_name='Vazir-Bold' ,color="black",pos_hint = {'center_x':xlabel , 'y':i-0.5})
+            self.linelabel2 = Label(text=fa(clean_text),font_size = 40, font_name=setting_manager.fonthead ,color=setting_manager.color,pos_hint = {'center_x':xlabel , 'y':i-0.5})
+            self.linelabels2.append(self.linelabel2)
             self.add_widget(self.linelabel2)
         
-        self.searchbox=TextInput(pos_hint={'x':0.01,'y':0.8},size_hint=(0.3,0.08),hint_text=fa("نام ایستگاه/مکان"),hint_text_color=(0.4, 0.4, 0.4, 1),font_name='Vazir',background_color="white",border=(4,4,4,4),base_direction='rtl',font_context='Vazir',text_language='fa',font_size=30)
+
+
+        
+        
+
+
+        self.searchbox=TextInput(pos_hint={'x':0.01,'y':0.8},size_hint=(0.3,0.08),hint_text=fa("نام ایستگاه/مکان"),hint_text_color=(0.4, 0.4, 0.4, 1),font_name="Vazir",background_color="white",border=(4,4,4,4),base_direction='rtl',font_context="Vazir",text_language='fa',font_size=30)
+        
         self.add_widget(self.searchbox)
         self.searchBtn=MDIconButton(pos_hint={'x':0.35,'y':0.8},size_hint=(0.08,0.08),icon="magnify",line_width=5,line_color=(0,0,0,1),rounded_button=True,md_bg_color=(0.75, 0.75, 0.75, 1))
         self.add_widget(self.searchBtn)
@@ -309,11 +349,11 @@ class TehranLineWin(Screen):
         self.footer = FloatLayout(pos_hint={'x': 0, 'y': 0}, size_hint=(1, 0.1))
         
 
-        settingBtn = MDIconButton(icon="icons8-settings-480.png",pos_hint={'center_x':0.1},icon_size="55sp")
-        apiMapBtn = MDIconButton(icon="mapapiicon.png",pos_hint={'center_x':0.3},icon_size="55sp")
-        mapBtn = MDIconButton(icon="mapicon.png",pos_hint={'center_x':0.9},icon_size="55sp")
-        navBtn = MDIconButton(icon="navicon.png",pos_hint={'center_x':0.7},icon_size="55sp")
-        lineBtn = MDIconButton(disabled=True, icon="lineicon2.png",pos_hint={'center_x':0.5},icon_size="55sp")
+        settingBtn = MDIconButton(icon="icons8-settings-480.png",pos_hint={'center_x':0.1,'center_y':.5},icon_size="50sp")
+        apiMapBtn = MDIconButton(icon="mapapiicon.png",pos_hint={'center_x':0.3,'center_y':.5},icon_size="50sp")
+        mapBtn = MDIconButton(icon="mapicon.png",pos_hint={'center_x':0.9,'center_y':.5},icon_size="50sp")
+        navBtn = MDIconButton(icon="navicon.png",pos_hint={'center_x':0.7,'center_y':.5},icon_size="50sp")
+        lineBtn = MDIconButton(disabled=True, icon="lineicon2.png",pos_hint={'center_x':0.5,'center_y':.5},icon_size="50sp")
         
         self.footer.rows = 1
         self.footer.cols = 5
@@ -332,21 +372,47 @@ class TehranLineWin(Screen):
         settingBtn.bind(on_press=self.setting_pressed)
 
         inside_header = FloatLayout(pos_hint={'x': 0, 'y': 0.9}, size_hint=(1, 0.1))
-        headerLabel = Label(text=fa("فهرست خطوط"), font_size=50, font_name='Vazir-Bold', color="white", pos_hint={'x': 0, 'y': 0})
-        inside_header.add_widget(headerLabel)
+        self.headerLabel = Label(text=fa("فهرست خطوط"), font_size=50, font_name=setting_manager.fonthead, color=setting_manager.colorhead, pos_hint={'x': 0, 'y': 0})
+        inside_header.add_widget(self.headerLabel)
         self.add_widget(inside_header)
+
+        setting_manager.bind(color=self.update_color)
+        setting_manager.bind(fonthead=self.update_fonthead)
+        setting_manager.bind(colorhead=self.update_colorhead)
+        setting_manager.bind(fonthead=self.update_font)
         
 
    
         
         
+    def update_color(self, instance, value):
+        for i in range(7):
+            self.linelabels1[i].color=value
+            self.linelabels2[i].color=value
+
+       
         
+    def update_colorhead(self, instance, value):
+        self.headerLabel.color = value
+        
+    def update_fonthead(self, instance, value):
+        self.headerLabel.font_name = value
+        for i in range(7):
+            self.linelabels1[i].font_name=value
+            self.linelabels2[i].color=value
+        
+    def update_font(self, instance, value):
+        return 
+
+
     def update_scroll_size(self, instance, value):
         self.search_results_scroll.height = self.searchbox.height * 2
 
     def update_rect(self, *args): 
         self.top_rect.pos = (0, self.height * 0.9) # Adjust position to be 90% down the screen 
         self.top_rect.size = (self.width, self.height * 0.1)
+        self.rect2.pos = (0, 0) # Adjust position to be 90% down the screen 
+        self.rect2.size = (self.width, self.height * 0.1)
 
     def update_scroll_rect(self, instance, value):
         self.rect.size = instance.size
@@ -456,19 +522,42 @@ class Setting(Screen):
         super(Setting, self).__init__(**kwargs)
     def on_kv_post(self, base_widget):
         with self.canvas.before:
-            self.rect_color = Color(0.4, 0.4, 0.4, 1)
+            self.rect_color = Color(0.5, 0.5, 0.5, 1)
             self.rect = Rectangle()
+            self.rect_color2 = Color(0.7, 0.7, 0.7,1)
+            self.rect2 = Rectangle()
         
         self.bind(size=self.update_rect, pos=self.update_rect)
         
+        self.sun_pic='sun1.png'
+        self.sun_dis=True
+        self.moon_pic='moon1.png'
+        self.moon_dis=False
+        self.Grid=FloatLayout(pos=(0,Window.height*0.1),size_hint=(1,0.8))
+        self.theme_lbl=Label(text=fa("پوسته ی برنامه : "),font_size = 50, font_name=setting_manager.font,color=setting_manager.color,pos_hint={'center_x':0.75,'center_y':.925})
+        theme_grid=GridLayout(size_hint=(0.35,0.9),cols=2,rows=1,pos_hint={'center_x':0.2,'center_y':.55})
+        self.sunbtn=MDIconButton(icon=self.sun_pic,disabled=self.sun_dis,icon_size="45sp",pos_hint={'center_x':0,'center_y':.5})
+        self.moonbtn=MDIconButton(icon=self.moon_pic,disabled=self.moon_dis,icon_size="45sp")
+        theme_grid.add_widget(self.sunbtn)
+        theme_grid.add_widget(self.moonbtn)
+        self.sunbtn.bind(on_press=self.sun_press)
+        self.moonbtn.bind(on_press=self.moon_press)
+        self.Grid.add_widget(theme_grid)
+        self.Grid.add_widget(self.theme_lbl)
+
+
+        self.add_widget(self.Grid)
+
+
+
         self.footer = FloatLayout(pos_hint={'x': 0, 'y': 0}, size_hint=(1, 0.1))
         
 
-        settingBtn = MDIconButton(disabled=True,icon="icons8-settings-4802.png",pos_hint={'center_x':0.1},icon_size="55sp")
-        apiMapBtn = MDIconButton(icon="mapapiicon.png",pos_hint={'center_x':0.3},icon_size="55sp")
-        mapBtn = MDIconButton(icon="mapicon.png",pos_hint={'center_x':0.9},icon_size="55sp")
-        navBtn = MDIconButton(icon="navicon.png",pos_hint={'center_x':0.7},icon_size="55sp")
-        lineBtn = MDIconButton(icon="lineicon.png",pos_hint={'center_x':0.5},icon_size="55sp")
+        settingBtn = MDIconButton(disabled=True,icon="icons8-settings-4802.png",pos_hint={'center_x':0.1,'center_y':.5},icon_size="50sp")
+        apiMapBtn = MDIconButton(icon="mapapiicon.png",pos_hint={'center_x':0.3,'center_y':.5},icon_size="50sp")
+        mapBtn = MDIconButton(icon="mapicon.png",pos_hint={'center_x':0.9,'center_y':.5},icon_size="50sp")
+        navBtn = MDIconButton(icon="navicon.png",pos_hint={'center_x':0.7,'center_y':.5},icon_size="50sp")
+        lineBtn = MDIconButton(icon="lineicon.png",pos_hint={'center_x':0.5,'center_y':.5},icon_size="50sp")
         
         self.footer.rows = 1
         self.footer.cols = 5
@@ -487,13 +576,54 @@ class Setting(Screen):
         apiMapBtn.bind(on_press=self.apimap_pressed)
 
         inside_header = FloatLayout(pos_hint={'x': 0, 'y': 0.9}, size_hint=(1, 0.1))
-        headerLabel = Label(text=fa("تنظیمات"), font_size=50, font_name='Vazir-Bold', color="white", pos_hint={'x': 0, 'y': 0})
-        inside_header.add_widget(headerLabel)
+        self.headerLabel = Label(text=fa("تنظیمات"), font_size=50, font_name=setting_manager.fonthead, color=setting_manager.colorhead, pos_hint={'x': 0, 'y': 0})
+        inside_header.add_widget(self.headerLabel)
         self.add_widget(inside_header)
+
+        setting_manager.bind(color=self.update_color)
+        setting_manager.bind(fonthead=self.update_fonthead)
+        setting_manager.bind(colorhead=self.update_colorhead)
+        setting_manager.bind(fonthead=self.update_font)
 
     def update_rect(self, *args): 
         self.rect.pos = (0, self.height * 0.9) # Adjust position to be 90% down the screen 
         self.rect.size = (self.width, self.height * 0.1)
+        self.rect2.pos = (0, 0) # Adjust position to be 90% down the screen 
+        self.rect2.size = (self.width, self.height * 0.1)
+
+    def sun_press(self, instance):
+        setting_manager.colorhead = [1,1,1, 1]
+        setting_manager.color = [0, 0, 0, 1]
+        self.sun_dis=False
+        self.sun_pic="sun2.png"
+        self.moonbtn.icon="moon1.png"
+        self.moonbtn.disabled=False
+        self.sunbtn.icon="sun1.png"
+        self.sunbtn.disabled=True
+        Window.clearcolor=(1,1,1,1)
+        
+    def moon_press(self, instance):
+        setting_manager.color = [1,1,1, 1]
+        setting_manager.colorhead = [0, 0, 0, 1]
+        self.moon_dis=False
+        self.moon_pic="moon2.png"
+        self.moonbtn.icon="moon2.png"
+        self.moonbtn.disabled=True
+        self.sunbtn.icon="sun2.png"
+        self.sunbtn.disabled=False
+        Window.clearcolor=(0,0,0,1)
+        
+    
+
+
+    def update_color(self, instance, value):
+        self.theme_lbl.color = value
+    def update_colorhead(self, instance, value):
+        self.headerLabel.color = value
+    def update_fonthead(self, instance, value):
+        self.headerLabel.font_name = value
+    def update_font(self, instance, value):
+        self.theme_lbl.font_name = value
 
     def map_pressed(self, instance):
         sm.current = "tehranmap"
@@ -508,8 +638,10 @@ class TehranAPIMap(Screen):
         super(TehranAPIMap, self).__init__(**kwargs)
     def on_kv_post(self, base_widget):
         with self.canvas.before:
-            self.rect_color = Color(0.4, 0.4, 0.4, 1)
+            self.rect_color = Color(0.5, 0.5, 0.5, 1)
             self.rect = Rectangle()
+            self.rect_color2 = Color(0.7, 0.7, 0.7,1)
+            self.rect2 = Rectangle()
         
         self.bind(size=self.update_rect, pos=self.update_rect)
         
@@ -528,11 +660,11 @@ class TehranAPIMap(Screen):
         self.footer = FloatLayout(pos_hint={'x': 0, 'y': 0}, size_hint=(1, 0.1))
         
 
-        settingBtn = MDIconButton(icon="icons8-settings-480.png",pos_hint={'center_x':0.1},icon_size="55sp")
-        apiMapBtn = MDIconButton(disabled=True,icon="mapapiicon2.png",pos_hint={'center_x':0.3},icon_size="55sp")
-        mapBtn = MDIconButton(icon="mapicon.png",pos_hint={'center_x':0.9},icon_size="55sp")
-        navBtn = MDIconButton(icon="navicon.png",pos_hint={'center_x':0.7},icon_size="55sp")
-        lineBtn = MDIconButton(icon="lineicon.png",pos_hint={'center_x':0.5},icon_size="55sp")
+        settingBtn = MDIconButton(icon="icons8-settings-480.png",pos_hint={'center_x':0.1,'center_y':.5},icon_size="50sp")
+        apiMapBtn = MDIconButton(disabled=True,icon="mapapiicon2.png",pos_hint={'center_x':0.3,'center_y':.5},icon_size="50sp")
+        mapBtn = MDIconButton(icon="mapicon.png",pos_hint={'center_x':0.9,'center_y':.5},icon_size="50sp")
+        navBtn = MDIconButton(icon="navicon.png",pos_hint={'center_x':0.7,'center_y':.5},icon_size="50sp")
+        lineBtn = MDIconButton(icon="lineicon.png",pos_hint={'center_x':0.5,'center_y':.5},icon_size="50sp")
         
         self.footer.rows = 1
         self.footer.cols = 5
@@ -551,13 +683,19 @@ class TehranAPIMap(Screen):
         settingBtn.bind(on_press=self.setting_pressed)
 
         inside_header = FloatLayout(pos_hint={'x': 0, 'y': 0.9}, size_hint=(1, 0.1))
-        headerLabel = Label(text=fa("نقشه متحرک"), font_size=50, font_name='Vazir-Bold', color="white", pos_hint={'x': 0, 'y': 0})
-        inside_header.add_widget(headerLabel)
+        self.headerLabel = Label(text=fa("نقشه متحرک"), font_size=50, font_name='Vazir-Bold', color=setting_manager.colorhead, pos_hint={'x': 0, 'y': 0})
+        setting_manager.bind(colorhead=self.update_theme)
+        inside_header.add_widget(self.headerLabel)
         self.add_widget(inside_header)
 
     def update_rect(self, *args): 
         self.rect.pos = (0, self.height * 0.9) # Adjust position to be 90% down the screen 
         self.rect.size = (self.width, self.height * 0.1)
+        self.rect2.pos = (0, 0) # Adjust position to be 90% down the screen 
+        self.rect2.size = (self.width, self.height * 0.1)
+
+    def update_theme(self, instance, value):
+        self.headerLabel.color = value
 
     def map_pressed(self, instance):
         sm.current = "tehranmap"
@@ -591,19 +729,21 @@ class TehranMap(Screen):
 
 
         with self.canvas.before:
-            self.rect_color = Color(0.4, 0.4, 0.4, 1)
+            self.rect_color = Color(0.5, 0.5, 0.5, 1)
             self.rect = Rectangle()
+            self.rect_color2 = Color(0.7, 0.7, 0.7,1)
+            self.rect2 = Rectangle()
         
         self.bind(size=self.update_rect, pos=self.update_rect)
         
         self.footer = FloatLayout(pos_hint={'x': 0, 'y': 0}, size_hint=(1, 0.1))
         
 
-        settingBtn = MDIconButton(icon="icons8-settings-480.png",pos_hint={'center_x':0.1},icon_size="55sp")
-        apiMapBtn = MDIconButton(icon="mapapiicon.png",pos_hint={'center_x':0.3},icon_size="55sp")
-        mapBtn = MDIconButton(disabled=True,icon="mapicon2.png",pos_hint={'center_x':0.9},icon_size="55sp")
-        navBtn = MDIconButton( icon="navicon.png",pos_hint={'center_x':0.7},icon_size="55sp")
-        lineBtn = MDIconButton(icon="lineicon.png",pos_hint={'center_x':0.5},icon_size="55sp")
+        settingBtn = MDIconButton(icon="icons8-settings-480.png",pos_hint={'center_x':0.1,'center_y':.5},icon_size="50sp")
+        apiMapBtn = MDIconButton(icon="mapapiicon.png",pos_hint={'center_x':0.3,'center_y':.5},icon_size="50sp")
+        mapBtn = MDIconButton(disabled=True,icon="mapicon2.png",pos_hint={'center_x':0.9,'center_y':.5},icon_size="50sp")
+        navBtn = MDIconButton( icon="navicon.png",pos_hint={'center_x':0.7,'center_y':.5},icon_size="50sp")
+        lineBtn = MDIconButton(icon="lineicon.png",pos_hint={'center_x':0.5,'center_y':.5},icon_size="50sp")
         
         self.footer.rows = 1
         self.footer.cols = 5
@@ -631,6 +771,8 @@ class TehranMap(Screen):
     def update_rect(self, *args): 
         self.rect.pos = (0, self.height * 0.9) # Adjust position to be 90% down the screen 
         self.rect.size = (self.width, self.height * 0.1)
+        self.rect2.pos = (0, 0) # Adjust position to be 90% down the screen 
+        self.rect2.size = (self.width, self.height * 0.1)
 
     def update_img(self, *args): 
         self.Grid.size_hint=(1,.8)
@@ -654,19 +796,22 @@ class TehranNav(Screen):
     def on_kv_post(self, base_widget):
         global screens
         with self.canvas.before:
-            self.rect_color = Color(0.4, 0.4, 0.4, 1)
+            self.rect_color = Color(0.5, 0.5, 0.5, 1)
             self.rect = Rectangle()
+            self.rect_color2 = Color(0.7, 0.7, 0.7,1)
+            self.rect2 = Rectangle()
+
         
         self.bind(size=self.update_rect, pos=self.update_rect)
         
         self.footer = FloatLayout(pos_hint={'x': 0, 'y': 0}, size_hint=(1, 0.1))
         
 
-        settingBtn = MDIconButton(icon="icons8-settings-480.png",pos_hint={'center_x':0.1},icon_size="55sp")
-        apiMapBtn = MDIconButton(icon="mapapiicon.png",pos_hint={'center_x':0.3},icon_size="55sp")
-        mapBtn = MDIconButton(icon="mapicon.png",pos_hint={'center_x':0.9},icon_size="55sp")
-        navBtn = MDIconButton(disabled=True, icon="navicon2.png",pos_hint={'center_x':0.7},icon_size="55sp")
-        lineBtn = MDIconButton(icon="lineicon.png",pos_hint={'center_x':0.5},icon_size="55sp")
+        settingBtn = MDIconButton(icon="icons8-settings-480.png",pos_hint={'center_x':0.1,'center_y':.5},icon_size="50sp")
+        apiMapBtn = MDIconButton(icon="mapapiicon.png",pos_hint={'center_x':0.3,'center_y':.5},icon_size="50sp")
+        mapBtn = MDIconButton(icon="mapicon.png",pos_hint={'center_x':0.9,'center_y':.5},icon_size="50sp")
+        navBtn = MDIconButton(disabled=True, icon="navicon2.png",pos_hint={'center_x':0.7,'center_y':.5},icon_size="50sp")
+        lineBtn = MDIconButton(icon="lineicon.png",pos_hint={'center_x':0.5,'center_y':.5},icon_size="50sp")
         
         self.footer.rows = 1
         self.footer.cols = 5
@@ -706,6 +851,8 @@ class TehranNav(Screen):
     def update_rect(self, *args): 
         self.rect.pos = (0, self.height * 0.9) # Adjust position to be 90% down the screen 
         self.rect.size = (self.width, self.height * 0.1)
+        self.rect2.pos = (0, 0) # Adjust position to be 90% down the screen 
+        self.rect2.size = (self.width, self.height * 0.1)
 
     def mapapi_pressed(self, instance):
         sm.current = "tehranapimap"

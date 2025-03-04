@@ -37,3 +37,5 @@ import heapq
 from functools import partial
 from kivy.garden.mapview import MapView,MapSource
 from kivy.uix.stencilview import StencilView
+from kivy.properties import ObjectProperty, ListProperty, StringProperty
+from kivy.event import EventDispatcher 
