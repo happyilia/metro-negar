@@ -1,5 +1,6 @@
 from imports import *
-
+from kivymd.uix.menu import MDDropdownMenu
+from kivymd.uix.button.button import MDRaisedButton
 
 
 script_dir = os.path.dirname(os.path.abspath(__file__))
@@ -137,6 +138,7 @@ class SettingManager(EventDispatcher):
     best_route = StringProperty("time")
     fonthead=StringProperty('Vazir-Bold')
     font=StringProperty('Vazir')
+    icon=StringProperty("")
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
@@ -544,9 +546,18 @@ class Setting(Screen):
         self.moonbtn.bind(on_press=self.moon_press)
         self.Grid.add_widget(theme_grid)
         self.Grid.add_widget(self.theme_lbl)
+        
 
+        self.cityBtn=Button(size_hint=(0.3,0.1),text=fa('تغییر شهر'), font_size=40,font_name='Vazir',background_color=(0,0,0.75,1),pos_hint={'x':0.35,'y':0.3})
+        self.cityBtn.bind(on_press=self.city_press)
+        self.Grid.add_widget(self.cityBtn)
 
+        self.listBtn=Button(text=fa("تغییر فونت"), font_size=40,font_name='Vazir',pos_hint={'center_x':.5,'center_y':.6},size_hint=(0.3,0.1))
+        self.Grid.add_widget(self.listBtn)
+        self.listBtn.bind(on_press=self.dropdown)
+        
         self.add_widget(self.Grid)
+        
 
 
 
@@ -585,6 +596,17 @@ class Setting(Screen):
         setting_manager.bind(colorhead=self.update_colorhead)
         setting_manager.bind(fonthead=self.update_font)
 
+
+    def dropdown(self,instance):
+        self.fontlist=MDDropdownMenu(caller=self.listBtn,width_mult=4)
+        self.fontlist.items.append({"viewclass": "OneLineListItem", "text": "Vazir", "on_release":lambda x="Vazir": self.callbacks})
+        self.fontlist.items.append({"viewclass": "OneLineListItem", "text": "IranNastaliq", "on_release":lambda x="IranNastaliq": self.callbacks})
+        self.fontlist.open()
+
+    def callbacks(self, value):
+        print("pressed")
+        setting_manager.font=value
+
     def update_rect(self, *args): 
         self.rect.pos = (0, self.height * 0.9) # Adjust position to be 90% down the screen 
         self.rect.size = (self.width, self.height * 0.1)
@@ -594,6 +616,7 @@ class Setting(Screen):
     def sun_press(self, instance):
         setting_manager.colorhead = [1,1,1, 1]
         setting_manager.color = [0, 0, 0, 1]
+        setting_manager.icon=""
         self.sun_dis=False
         self.sun_pic="sun2.png"
         self.moonbtn.icon="moon1.png"
@@ -605,6 +628,7 @@ class Setting(Screen):
     def moon_press(self, instance):
         setting_manager.color = [1,1,1, 1]
         setting_manager.colorhead = [0, 0, 0, 1]
+        setting_manager.icon=" light"
         self.moon_dis=False
         self.moon_pic="moon2.png"
         self.moonbtn.icon="moon2.png"
@@ -612,8 +636,11 @@ class Setting(Screen):
         self.sunbtn.icon="sun2.png"
         self.sunbtn.disabled=False
         Window.clearcolor=(0,0,0,1)
-        
+
     
+        
+    def city_press(self,instance):
+        sm.current="welcome"
 
 
     def update_color(self, instance, value):
@@ -924,6 +951,7 @@ class LineWin(Screen):
         intersecs=open_intersecs.read().split('\n')
         k=0
         self.inters=[]
+        self.labels=[]
         for i in lines:
             if i in intersecs :
                 
@@ -938,7 +966,7 @@ class LineWin(Screen):
                 StationBtns.append( BaseButton(line_width = 10,line_color=self.rang,rounded_button=True,md_bg_color=(1,1,1,1)))
                 StationBtns[-1].pos_hint = {'center_x': 0.5, 'center_y': 0.5}
 
-            label = Label(text=i, size_hint=(None, None), color="black", font_name="Vazir", font_size=47)
+            label = Label(text=i, size_hint=(None, None), color=setting_manager.color, font_name="Vazir", font_size=47)
 
             float_layout = FloatLayout(size_hint_y=None, height=StationBtns[len(StationBtns)-1].height)
             if lines.index(i) % 2 == 0:
@@ -948,6 +976,7 @@ class LineWin(Screen):
             
             
             label.pos_hint = {'x': xlabel, 'center_y': 0.1}
+            self.labels.append(label)
             float_layout.add_widget(StationBtns[-1])
             float_layout.add_widget(label)
             layoutscroll.add_widget(float_layout)
@@ -986,26 +1015,35 @@ class LineWin(Screen):
         inside_header.add_widget(headerLabel)
         self.add_widget(inside_header)
         self.info_layout = FloatLayout(size_hint=(0.2, 0.1), pos_hint={'x': 0.8, 'y':0.1})
-        self.infoBtn = MDIconButton(rounded_button=False,icon=os.path.join(script_dir, "more-info-icon.png"),icon_size="42sp",pos_hint={'center_x':0.5})
+        self.infoBtn = MDIconButton(rounded_button=False,icon=os.path.join(script_dir, "more-info-icon"+setting_manager.icon+".png"),icon_size="42sp",pos_hint={'center_x':0.5})
         self.info_layout.add_widget(self.infoBtn)
         self.infoBtn.bind(on_press=self.info_pressed)
         self.add_widget(self.info_layout)
 
         self.back_layout = FloatLayout(size_hint=(0.2, 0.1), pos_hint={'x': 0.05, 'top': 1}) 
-        backBtn = MDIconButton(icon="back.png", icon_size="42sp") 
-        self.back_layout.add_widget(backBtn) 
+        self.backBtn = MDIconButton(icon="back"+setting_manager.icon+".png", icon_size="42sp") 
+        self.back_layout.add_widget(self.backBtn) 
         self.add_widget(self.back_layout)
-        backBtn.bind(on_press=self.back_pressed)
+        self.backBtn.bind(on_press=self.back_pressed)
         layoutscroll.bind(minimum_height=layoutscroll.setter('height'))
         self.bind(size=self.layout_update)
         self.StationBtns = StationBtns
         self.layoutscroll = layoutscroll
         self.rangs = rangs
         self.bind(size=lambda instance,idx=self.layoutscroll: self.clearing_canvas_2(idx))
+        setting_manager.bind(color=self.update_color)
+        setting_manager.bind(icon=self.update_icon)
         Clock.schedule_interval(self.line_update, 0.1)
         
         
     
+    def update_color(self, instance, value):
+        for i in range(len(self.labels)):
+            self.labels[i].color=value
+            
+    def update_icon(self, instance, value):
+        self.backBtn.icon="back"+value+".png"
+        self.infoBtn.icon="more-info-icon"+value+".png"
 
     def clearing_canvas_2(self,layoutscroll,*args):
         self.clearing_canvas(self.layoutscroll)
@@ -1112,26 +1150,28 @@ class StationWin(Screen):
         self.layout = GridLayout(size_hint=(1,.9))
         self.layout.rows=6
         self.layout.cols=1
-        lblenters=Label(text=fa("تعداد ورودی ها :"),color="black", font_name="Vazir-Bold", font_size=50)
-        self.layout.add_widget(lblenters)
-        enters=Label(text=fa(staEnters),color="black", font_name="Vazir", font_size=45)
-        self.layout.add_widget(enters)
-        lblatms=Label(text=fa("تعداد خودپرداز ها :"),color="black", font_name="Vazir-Bold", font_size=50)
-        self.layout.add_widget(lblatms)
-        atms=Label(text=fa(staATMs),color="black", font_name="Vazir", font_size=45)
-        self.layout.add_widget(atms)
-        lblplaces=Label(text=fa("مکان های مهم اطراف :"),color="black", font_name="Vazir-Bold", font_size=50)
-        self.layout.add_widget(lblplaces)
-        places=Label(text=fa(staPlaces),color="black", font_name="Vazir", font_size=45)
-        self.layout.add_widget(places)
+        self.lblenters=Label(text=fa("تعداد ورودی ها :"),color=setting_manager.color, font_name="Vazir-Bold", font_size=50)
+        self.layout.add_widget(self.lblenters)
+        self.enters=Label(text=fa(staEnters),color=setting_manager.color, font_name="Vazir", font_size=45)
+        self.layout.add_widget(self.enters)
+        self.lblatms=Label(text=fa("تعداد خودپرداز ها :"),color=setting_manager.color, font_name="Vazir-Bold", font_size=50)
+        self.layout.add_widget(self.lblatms)
+        self.atms=Label(text=fa(staATMs),color=setting_manager.color, font_name="Vazir", font_size=45)
+        self.layout.add_widget(self.atms)
+        self.lblplaces=Label(text=fa("مکان های مهم اطراف :"),color=setting_manager.color, font_name="Vazir-Bold", font_size=50)
+        self.layout.add_widget(self.lblplaces)
+        self.places=Label(text=fa(staPlaces),color=setting_manager.color, font_name="Vazir", font_size=45)
+        self.layout.add_widget(self.places)
 
         self.add_widget(self.layout)
 
         self.back_layout = FloatLayout(size_hint=(0.2, 0.1), pos_hint={'x': 0.05, 'top': 1}) 
-        backBtn = Button(background_normal="back.png", background_down="back.png") 
-        self.back_layout.add_widget(backBtn) 
+        self.backBtn = Button(background_normal="back"+setting_manager.icon+".png") 
+        self.back_layout.add_widget(self.backBtn) 
         self.add_widget(self.back_layout)
-        backBtn.bind(on_press=lambda instance,idx=self.nam: self.back_pressed(idx))
+        self.backBtn.bind(on_press=lambda instance,idx=self.nam: self.back_pressed(idx))
+        setting_manager.bind(color=self.update_color)
+        setting_manager.bind(icon=self.update_icon)
 
     def update_rect(self, *args): 
         self.rect.pos = (0, self.height * 0.9) # Adjust position to be 90% down the screen 
@@ -1140,8 +1180,22 @@ class StationWin(Screen):
     def back_pressed(self,namd,*args):
         sm.current="tehline"+str(namd)
     
+    def update_color(self, instance, value):
+        self.lblenters.color=value
+        
+        self.enters.color=value
+        
+        self.lblatms.color=value
+       
+        self.atms.color=value
+        
+        self.lblplaces.color=value
 
-
+        self.places.color=value
+        
+    def update_icon(self, instance, value):
+        self.backBtn.icon="back"+value+".png"
+        
 
 class MyApp(MDApp):
     def build(self):
