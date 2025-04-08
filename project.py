@@ -8,7 +8,24 @@ kv = Builder.load_file("my.kv")
 Window.clearcolor = (1, 1, 1, 1)
 tehlinecolors = [(1,0,0,1),(0,0,1,1),(0,0.8,1,1),(1,0.89,0,1),(0,0.5,0,1),(1,0.45,0.85,1),(0.65,0,1,1)]
 theme=(1,1,1,1)
+tehranlinecolors = [(1,0,0,1),(0,0,1,1),(0,0.8,1,1),(1,0.89,0,1),(0,0.5,0,1),(1,0.45,0.85,1),(0.65,0,1,1),7]
+mashhadlinecolors= [(0,0.5,0,1),(0,0,1,1),(1,0,0,1),3]
+isfahanlinecolors=[(0,0.5,0,1),1]
+shirazlinecolors=[(0,0.5,0,1),(0,0.5,0,1),2]
+tabrizlinecolors=[(0,0.5,0,1),1]
+karajlinecolors=[(0,0.5,0,1),(0,0.5,0,1),2]
 
+towncolors={
+    "tehran":tehranlinecolors,"mashhad":mashhadlinecolors,"isfahan":isfahanlinecolors,"shiraz":shirazlinecolors,"tabriz":tabrizlinecolors,"karaj":karajlinecolors
+    }
+townnumlines={
+    "tehran":7,
+    "mashhad":3,
+    "isfahan":1,
+    "shiraz":2,
+    "tabriz":1,
+    "karaj":2
+}
 
 def fa(txt):
     return txt
@@ -61,36 +78,36 @@ def dijkstra_with_total_weight(graph, start, end):
     path.reverse()
     return path, total_weight
 
-def finder(txt):
+def finder(txt,town):
     
-    for i in range(1,8):
-        file_path = os.path.join(script_dir, "tehran\\line"+str(i)+".txt")
+    for i in range(1,townnumlines[town]+1):
+        file_path = os.path.join(script_dir, str(town)+"\\line"+str(i)+".txt")
         linetxt= open(file_path,'r', encoding='utf-8')
         linetxt=linetxt.read()
         linetxt = linetxt.split('\n')
         if txt in linetxt:
             
-            return str(i)+','+str(linetxt.index(txt)+1)
+            return str(i)+','+str(linetxt.index(txt)+1)+town
     return False
 
-def nearplacesfinder(txt):
+def nearplacesfinder(txt,town):
     
-    for i in range(1,8):
-        file_path = os.path.join(script_dir, "tehran\\line"+str(i)+"infoplaces.txt")
+    for i in range(1,townnumlines[town]+1):
+        file_path = os.path.join(script_dir, str(town)+"\\line"+str(i)+"infoplaces.txt")
         linetxt= open(file_path,'r', encoding='utf-8')
         linetxt=linetxt.read()
         linetxt = linetxt.split('\n')
         for j in linetxt:
             if txt in j:
                 
-                return str(i)+','+str(linetxt.index(j)+1)
+                return str(i)+','+str(linetxt.index(j)+1)+town
     return False
 
 
-def line_finder(pot):
+def line_finder(pot,town):
     lines=[]
-    for i in range(1,8):
-        file_path = os.path.join(script_dir, "tehran\\line"+str(i)+".txt")
+    for i in range(1,townnumlines[town]+1):
+        file_path = os.path.join(script_dir, str(town)+"\\line"+str(i)+".txt")
         linetxt= open(file_path,'r', encoding='utf-8')
         linetxt=linetxt.read()
         linetxt = linetxt.split('\n')
@@ -98,10 +115,30 @@ def line_finder(pot):
             if j in linetxt and i not in lines:
                 lines.append(i)
     return lines
+def towncolor(town):
+    tehranlinecolors = [(1,0,0,1),(0,0,1,1),(0,0.8,1,1),(1,0.89,0,1),(0,0.5,0,1),(1,0.45,0.85,1),(0.65,0,1,1),7]
+    mashhadlinecolors= [(0,0.5,0,1),(0,0,1,1),(1,0,0,1),3]
+    isfahanlinecolors=[(0,0.5,0,1),1]
+    shirazlinecolors=[(0,0.5,0,1),(0,0.5,0,1),2]
+    tabrizlinecolors=[(0,0.5,0,1),1]
+    karajlinecolors=[(0,0.5,0,1),(0,0.5,0,1),2]
+    towns=["tehran","mashhad","isfahan","shiraz","tabriz","karaj"]
+    towncolors={
+        "tehran":tehranlinecolors,"mashhad":mashhadlinecolors,"isfahan":isfahanlinecolors,"shiraz":shirazlinecolors,"tabriz":tabrizlinecolors,"karaj":karajlinecolors
+    }
+    return towncolors[town]
+
+def townbtnspos(town):
+    return [0.8,0.6875,0.575,0.4625,0.35,0.2375,0.1250]
+
+def townLatLon(town):
+    if town=="mashhad":
+        return (36.310699,59.599457)
+    return (35.715298,51.404343)
 
 #tehran_graph
-teh_graph={}
-teh_stations=[]
+tehran_graph={}
+tehran_stations=[]
 o=0
 for i in range(1,8):
     file_path = os.path.join(script_dir, "tehran\\line"+str(i)+".txt")
@@ -109,23 +146,56 @@ for i in range(1,8):
     linetxt=linetxt.read()
     linetxt = linetxt.split('\n')
     for j in range(len(linetxt)):
-        if linetxt[j] not in teh_stations and j!=0 and j!=len(linetxt)-1:
-            teh_graph[linetxt[j]] = {}
-            teh_graph[linetxt[j]][linetxt[j+1]]=5
-            teh_graph[linetxt[j]][linetxt[j-1]]=5
-            teh_stations.append(linetxt[j])
+        if linetxt[j] not in tehran_stations and j!=0 and j!=len(linetxt)-1:
+            tehran_graph[linetxt[j]] = {}
+            tehran_graph[linetxt[j]][linetxt[j+1]]=5
+            tehran_graph[linetxt[j]][linetxt[j-1]]=5
+            tehran_stations.append(linetxt[j])
         elif j==0:
-            teh_graph[linetxt[j]] = {}
-            teh_graph[linetxt[j]][linetxt[j + 1]] = 5
-            teh_stations.append(linetxt[j])
+            tehran_graph[linetxt[j]] = {}
+            tehran_graph[linetxt[j]][linetxt[j + 1]] = 5
+            tehran_stations.append(linetxt[j])
         elif j==len(linetxt)-1:
-            teh_graph[linetxt[j]] = {}
-            teh_graph[linetxt[j]][linetxt[j-1]]=5
+            tehran_graph[linetxt[j]] = {}
+            tehran_graph[linetxt[j]][linetxt[j-1]]=5
             
-            teh_stations.append(linetxt[j])
-        elif linetxt[j] in teh_stations:
-            teh_graph[linetxt[j]].update({linetxt[j+1]:5,linetxt[j-1]:5})
+            tehran_stations.append(linetxt[j])
+        elif linetxt[j] in tehran_stations:
+            tehran_graph[linetxt[j]].update({linetxt[j+1]:5,linetxt[j-1]:5})
 
+#mashhad_graph
+mashhad_graph={}
+mashhad_stations=[]
+o=0
+for i in range(1,3):
+    file_path = os.path.join(script_dir, "mashhad\\line"+str(i)+".txt")
+    linetxt= open(file_path,'r', encoding='utf-8')
+    linetxt=linetxt.read()
+    linetxt = linetxt.split('\n')
+    for j in range(len(linetxt)):
+        if linetxt[j] not in mashhad_stations and j!=0 and j!=len(linetxt)-1:
+            mashhad_graph[linetxt[j]] = {}
+            mashhad_graph[linetxt[j]][linetxt[j+1]]=5
+            mashhad_graph[linetxt[j]][linetxt[j-1]]=5
+            mashhad_stations.append(linetxt[j])
+        elif j==0:
+            mashhad_graph[linetxt[j]] = {}
+            mashhad_graph[linetxt[j]][linetxt[j + 1]] = 5
+            mashhad_stations.append(linetxt[j])
+        elif j==len(linetxt)-1:
+            mashhad_graph[linetxt[j]] = {}
+            mashhad_graph[linetxt[j]][linetxt[j-1]]=5
+            
+            mashhad_stations.append(linetxt[j])
+        elif linetxt[j] in mashhad_stations:
+            mashhad_graph[linetxt[j]].update({linetxt[j+1]:5,linetxt[j-1]:5})
+
+print(mashhad_graph)
+
+all_town_graphs={
+    "tehran":tehran_graph,
+    "mashhad":mashhad_graph
+}
 class Node:
   def __init__(self,x_coord,y_coord):
       self.d=float('inf') #current distance from source node
@@ -139,7 +209,7 @@ class SettingManager(EventDispatcher):
     fonthead=StringProperty('Vazir-Bold')
     font=StringProperty('Vazir')
     icon=StringProperty("")
-
+    city=StringProperty("tehran")
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
 
@@ -184,13 +254,14 @@ class WelcomeWindow(Screen):
         self.inside2.add_widget(self.label1)
         setting_manager.bind(color=self.update_color)
         setting_manager.bind(font=self.update_font)
+        setting_manager.bind(fonthead=self.update_fonthead)
 
         self.tehran_btn = MDIconButton(icon="tehranlogo.png",icon_size="55sp")
         self.tehran_btn.bind(on_press=self.pressedtbtn)
         self.insidebtn.add_widget(self.tehran_btn)
 
         self.mashhad_btn = MDIconButton(icon="mashhadlogo.png",icon_size="55sp")
-        self.mashhad_btn.bind(on_press=self.pressed)
+        self.mashhad_btn.bind(on_press=self.pressedmashhadbtn)
         self.insidebtn.add_widget(self.mashhad_btn)
 
         self.isfahan_btn = MDIconButton(icon="isfahanlogo.png",icon_size="55sp")
@@ -215,6 +286,10 @@ class WelcomeWindow(Screen):
 
     def pressedtbtn(self, intance):
         sm.current = "tehranline"
+        setting_manager.city="tehran"
+    def pressedmashhadbtn(self, intance):
+        sm.current = "mashhadline"
+        setting_manager.city="mashhad"
     def pressed(self, intance):
         print("pressed")
 
@@ -235,81 +310,64 @@ class WelcomeWindow(Screen):
         self.headerLabel.font_name = value
     def update_font(self, instance, value):
         self.label1.font_name = value
-class TehranLineWin(Screen):
-    def __init__(self, **kwargs):
-        super(TehranLineWin, self).__init__(**kwargs)
-        
-    def on_kv_post(self, base_widget):
+class LinesPage(Screen):
+    def __init__(self,town, **kwargs):
+        self.town=town
+        super(LinesPage, self).__init__(**kwargs)
+    
+    def line1_pressed(self, instance):
+        sm.current=self.town+"line1"
+    def line2_pressed(self, instance):
+        sm.current=self.town+"line2"
+    def line3_pressed(self, instance):
+        sm.current=self.town+"line3"
 
+    def line4_pressed(self, instance):
+        sm.current=self.town+"line4"
+    def line5_pressed(self, instance):
+        sm.current=self.town+"line5"
+
+    def line6_pressed(self, instance):
+        sm.current=self.town+"line6"
+    def line7_pressed(self, instance):
+        sm.current=self.town+"line7"
+
+    def on_kv_post(self, base_widget):
+        
+        self.towncolor=towncolor(self.town)
+        self.townbtnspos=townbtnspos(self.town)
+        self.num_line=self.towncolor[-1]
         with self.canvas.before:
             self.toprect_color = Color(0.5, 0.5, 0.5, 1)
             self.top_rect = Rectangle()
             self.rect_color2 = Color(0.7, 0.7, 0.7,1)
             self.rect2 = Rectangle()
-        
+        self.lines=[]
         with self.canvas:
-            Color(1, 0, 0, 1) 
-            self.line = Line(width=10)
-        with self.canvas:
-            Color(0, 0, 1, 1) 
-            self.line2 = Line(width=10)
-        with self.canvas:
-            Color(0,0.8,1,1) 
-            self.line3 = Line(width=10)
-        with self.canvas:
-            Color(1,0.89,0,1)
-            self.line4 = Line(width=10)
-        with self.canvas:
-            Color(0,0.5,0,1)
-            self.line5 = Line(width=10)
-        with self.canvas:
-            Color(1,0.45,0.85,1)
-            self.line6 = Line(width=10)
-        with self.canvas:
-            Color(0.65,0,1,1)
-            self.line7 = Line(width=10)
-        
-        line1Btn= BaseButton(pos_hint = {'center_x':.5 , 'y':0.8},line_width = 10,line_color=(1,0,0,1),rounded_button=True,md_bg_color=(1,1,1,1))
-        line1Btn.bind(on_press=self.line1_pressed)
-        self.add_widget(line1Btn)
-
-        line2Btn= BaseButton(pos_hint = {'center_x':.5 , 'y':0.6875},line_width = 10,line_color=(0,0,1,1),rounded_button=True,md_bg_color=(1,1,1,1))
-        line2Btn.bind(on_press=self.line2_pressed)
-        self.add_widget(line2Btn)
-
-        line3Btn= BaseButton(pos_hint = {'center_x':.5 , 'y':0.5750},line_width = 10,line_color=(0,0.8,1,1),rounded_button=True,md_bg_color=(1,1,1,1))
-        line3Btn.bind(on_press=self.line3_pressed)
-        self.add_widget(line3Btn)
-
-        line4Btn= BaseButton(pos_hint = {'center_x':.5 , 'y':0.4625},line_width = 10,line_color=(1,0.89,0,1),rounded_button=True,md_bg_color=(1,1,1,1))
-        line4Btn.bind(on_press=self.line4_pressed)
-        self.add_widget(line4Btn)
-
-        line5Btn= BaseButton(pos_hint = {'center_x':.5 , 'y':0.3500},line_width = 10,line_color=(0,0.5,0,1),rounded_button=True,md_bg_color=(1,1,1,1))
-        line5Btn.bind(on_press=self.line5_pressed)
-        self.add_widget(line5Btn)
-
-        line6Btn= BaseButton(pos_hint = {'center_x':.5 , 'y':0.2375},line_width = 10,line_color=(1,0.45,0.85,1),rounded_button=True,md_bg_color=(1,1,1,1))
-        line6Btn.bind(on_press=self.line6_pressed)
-        self.add_widget(line6Btn)
-
-        line7Btn= BaseButton(pos_hint = {'center_x':.5 , 'y':0.1250},line_width = 10,line_color=(0.65,0,1,1),rounded_button=True,md_bg_color=(1,1,1,1))
-        line7Btn.bind(on_press=self.line7_pressed)
-        self.add_widget(line7Btn)
+            for i in range(self.num_line):
+                Color(*self.towncolor[i])
+                self.lines.append(Line(width=10))
+        self.lineBtns=[]
+        for i in range(self.num_line):
+            self.lineBtns.append(BaseButton(pos_hint = {'center_x':.5 , 'y':self.townbtnspos[i]},line_width = 10,line_color=self.towncolor[i],rounded_button=True,md_bg_color=(1,1,1,1)))
+            self.add_widget(self.lineBtns[-1])
+            function_name = f"line{i+1}_pressed"
+            function_to_call = getattr(self, function_name)
+            self.lineBtns[i].bind(on_press=function_to_call)
         
         self.bind(size=self.update_rect, pos=self.update_rect)
         self.bind(size=self.update_line_position, pos=self.update_line_position) 
-        line1Btn.bind(pos=self.update_line_position)
+        self.lineBtns[0].bind(pos=self.update_line_position)
         self.linelabels1=[]
         self.linelabels2=[]
         j=0
-        for i in (0.8,0.6875,0.5750,0.4625,0.35,0.2375,0.125):
+        for i in self.townbtnspos[:self.num_line]:
             j+=1
             if j%2!=0:
                 xlabel=0.8
             else:
                 xlabel=0.3
-            file_path = os.path.join(script_dir, "tehran\\line"+str(j)+".txt")
+            file_path = os.path.join(script_dir, str(self.town)+"\\line"+str(j)+".txt")
             linetxt= open(file_path,'r', encoding='utf-8')
             self.linelabel = Label(text=fa("خط "+str(j)),font_size = 40, font_name=setting_manager.fonthead ,color=setting_manager.color,pos_hint = {'center_x':xlabel , 'y':i-0.45})
             self.linelabels1.append(self.linelabel)
@@ -328,7 +386,7 @@ class TehranLineWin(Screen):
         
 
 
-        self.searchbox=TextInput(pos_hint={'x':0.01,'y':0.8},size_hint=(0.3,0.08),hint_text=fa("نام ایستگاه/مکان"),hint_text_color=(0.4, 0.4, 0.4, 1),font_name="Vazir",background_color="white",border=(4,4,4,4),base_direction='rtl',font_context="Vazir",text_language='fa',font_size=30)
+        self.searchbox=TextInput(pos_hint={'x':0.01,'y':0.8},size_hint=(0.3,0.08),hint_text=fa("نام ایستگاه/مکان"),hint_text_color=(0.4, 0.4, 0.4, 1),font_name=setting_manager.font,background_color="white",border=(4,4,4,4),base_direction='rtl',font_context=setting_manager.font,text_language='fa',font_size=30)
         
         self.add_widget(self.searchbox)
         self.searchBtn=MDIconButton(pos_hint={'x':0.35,'y':0.8},size_hint=(0.08,0.08),icon="magnify",line_width=5,line_color=(0,0,0,1),rounded_button=True,md_bg_color=(0.75, 0.75, 0.75, 1))
@@ -382,26 +440,30 @@ class TehranLineWin(Screen):
         setting_manager.bind(fonthead=self.update_fonthead)
         setting_manager.bind(colorhead=self.update_colorhead)
         setting_manager.bind(fonthead=self.update_font)
+        setting_manager.bind(city=self.update_city)
         
 
    
         
         
     def update_color(self, instance, value):
-        for i in range(7):
+        for i in range(self.num_line):
             self.linelabels1[i].color=value
             self.linelabels2[i].color=value
 
-       
+    def update_city(self, instance, value):
+        pass
         
     def update_colorhead(self, instance, value):
         self.headerLabel.color = value
+        for i in range(self.num_line):
+            self.lineBtns[i].md_bg_color=value
         
     def update_fonthead(self, instance, value):
         self.headerLabel.font_name = value
-        for i in range(7):
+        for i in range(self.num_line):
             self.linelabels1[i].font_name=value
-            self.linelabels2[i].color=value
+            self.linelabels2[i].font_name=value
         
     def update_font(self, instance, value):
         return 
@@ -421,41 +483,24 @@ class TehranLineWin(Screen):
         self.rect.pos = instance.pos
 
     def update_line_position(self, *args):
-        self.line.points = [self.children[1].center_x, self.children[25].center_y, self.width, self.children[25].center_y]
-        self.line2.points = [self.children[1].center_x, self.children[24].center_y, 0, self.children[24].center_y]
-        self.line3.points = [self.children[1].center_x, self.children[23].center_y, self.width, self.children[23].center_y]
-        self.line4.points = [self.children[1].center_x, self.children[22].center_y, 0, self.children[22].center_y]
-        self.line5.points = [self.children[1].center_x, self.children[21].center_y, self.width, self.children[21].center_y]
-        self.line6.points = [self.children[1].center_x, self.children[20].center_y, 0, self.children[20].center_y]
-        self.line7.points = [self.children[1].center_x, self.children[19].center_y, self.width, self.children[19].center_y]
+        for i in range(self.num_line):
+            if i%2==0:
+                self.lines[i].points = [self.children[1].center_x, self.children[len(self.children)-i-1].center_y, self.width, self.children[len(self.children)-i-1].center_y]
+            else:
+                 self.lines[i].points = [self.children[1].center_x, self.children[len(self.children)-i-1].center_y, 0, self.children[len(self.children)-i-1].center_y]
         
         
         
 
     def map_pressed(self, instance):
-        sm.current = "tehranmap"
+        sm.current = self.town+"map"
     def apimap_pressed(self, instance):
-        sm.current = "tehranapimap"
+        sm.current = self.town+"apimap"
     def nav_pressed(self, instance):
-        sm.current = "tehrannav"
+        sm.current = self.town+"nav"
     def setting_pressed(self, instance):
         sm.current = "setting"
-    def line1_pressed(self, instance):
-        sm.current="tehline1"
-    def line2_pressed(self, instance):
-        sm.current="tehline2"
-    def line3_pressed(self, instance):
-        sm.current="tehline3"
-
-    def line4_pressed(self, instance):
-        sm.current="tehline4"
-    def line5_pressed(self, instance):
-        sm.current="tehline5"
-
-    def line6_pressed(self, instance):
-        sm.current="tehline6"
-    def line7_pressed(self, instance):
-        sm.current="tehline7"
+    
     # def on_label_touch_down(self, instance, touch, match):
     #     print(instance)
     #     self.searchbox.text = self.ser_labels[instance].text
@@ -474,7 +519,7 @@ class TehranLineWin(Screen):
         if value.strip(): 
             matches = self.search_names(value)
             for match in matches:
-                label = Label(text=fa(match), font_size=30, font_name='Vazir-Bold', color="black")
+                label = Label(text=fa(match), font_size=30, font_name=setting_manager.font, color="black")
                 
                 # Bind the touch event properly using partial
                 label.bind(on_touch_down=partial(self.on_label_touch_down, match))
@@ -493,14 +538,14 @@ class TehranLineWin(Screen):
     def search_names(self, query):
         script_dir = os.path.dirname(__file__)
         names = []
-        for i in range(1, 8):
-            file_path = os.path.join(script_dir, "tehran", f"line{i}.txt")
+        for i in range(1, townnumlines[self.town]):
+            file_path = os.path.join(script_dir, self.town, f"line{i}.txt")
             with open(file_path, 'r', encoding='utf-8') as file:
                 names.extend([line.strip() for line in file])
             
         pattern = re.compile(query, re.IGNORECASE)
-        for i in range(1, 8):
-            file_path = os.path.join(script_dir, "tehran", f"line{i}infoplacescut.txt")
+        for i in range(1, townnumlines[self.town]):
+            file_path = os.path.join(script_dir, self.town, f"line{i}infoplacescut.txt")
             with open(file_path, 'r', encoding='utf-8') as file:
                 names.extend([line.strip("، ") for line in file])
             
@@ -510,11 +555,11 @@ class TehranLineWin(Screen):
         return [name for name in names if pattern.search(name)]
     
     def searchBtn_pressed(self,instance):
-        k=finder(self.searchbox.text)
+        k=finder(self.searchbox.text,self.town)
         if k!=False:
             sm.current=k
         else:
-            k=nearplacesfinder(self.searchbox.text)
+            k=nearplacesfinder(self.searchbox.text,self.town)
             if k!=False:
                 sm.current=k
         self.searchbox.text = ''
@@ -523,6 +568,7 @@ class Setting(Screen):
     def __init__(self, **kwargs):
         super(Setting, self).__init__(**kwargs)
     def on_kv_post(self, base_widget):
+        
         with self.canvas.before:
             self.rect_color = Color(0.5, 0.5, 0.5, 1)
             self.rect = Rectangle()
@@ -548,11 +594,11 @@ class Setting(Screen):
         self.Grid.add_widget(self.theme_lbl)
         
 
-        self.cityBtn=Button(size_hint=(0.3,0.1),text=fa('تغییر شهر'), font_size=40,font_name='Vazir',background_color=(0,0,0.75,1),pos_hint={'x':0.35,'y':0.3})
+        self.cityBtn=Button(size_hint=(0.3,0.1),text=fa('تغییر شهر'), font_size=40,font_name=setting_manager.font,pos_hint={'x':0.35,'y':0.3})
         self.cityBtn.bind(on_press=self.city_press)
         self.Grid.add_widget(self.cityBtn)
 
-        self.listBtn=Button(text=fa("تغییر فونت"), font_size=40,font_name='Vazir',pos_hint={'center_x':.5,'center_y':.6},size_hint=(0.3,0.1))
+        self.listBtn=Button(text=fa("تغییر فونت"), font_size=40,font_name=setting_manager.font,pos_hint={'center_x':.5,'center_y':.6},size_hint=(0.3,0.1))
         self.Grid.add_widget(self.listBtn)
         self.listBtn.bind(on_press=self.dropdown)
         
@@ -599,13 +645,17 @@ class Setting(Screen):
 
     def dropdown(self,instance):
         self.fontlist=MDDropdownMenu(caller=self.listBtn,width_mult=4)
-        self.fontlist.items.append({"viewclass": "OneLineListItem", "text": "Vazir", "on_release":lambda x="Vazir": self.callbacks})
-        self.fontlist.items.append({"viewclass": "OneLineListItem", "text": "IranNastaliq", "on_release":lambda x="IranNastaliq": self.callbacks})
+        self.fontlist.items.append({"viewclass": "OneLineListItem", "text": "Vazir", "on_release":lambda x="Vazir": self.menu_callback(x)})
+        self.fontlist.items.append({"viewclass": "OneLineListItem", "text": "Roya", "on_release":lambda x="Roya": self.menu_callback(x)})
+        self.fontlist.items.append({"viewclass": "OneLineListItem", "text": "Traffic", "on_release":lambda x="Traffic": self.menu_callback(x)})
+        self.fontlist.items.append({"viewclass": "OneLineListItem", "text": "Negaar", "on_release":lambda x="Negaar": self.menu_callback(x)})
         self.fontlist.open()
 
-    def callbacks(self, value):
-        print("pressed")
-        setting_manager.font=value
+    def menu_callback(self, selected_item):
+        
+        setting_manager.font=selected_item
+        setting_manager.fonthead=selected_item+'-Bold'
+        self.fontlist.dismiss()
 
     def update_rect(self, *args): 
         self.rect.pos = (0, self.height * 0.9) # Adjust position to be 90% down the screen 
@@ -617,6 +667,7 @@ class Setting(Screen):
         setting_manager.colorhead = [1,1,1, 1]
         setting_manager.color = [0, 0, 0, 1]
         setting_manager.icon=""
+        
         self.sun_dis=False
         self.sun_pic="sun2.png"
         self.moonbtn.icon="moon1.png"
@@ -647,22 +698,27 @@ class Setting(Screen):
         self.theme_lbl.color = value
     def update_colorhead(self, instance, value):
         self.headerLabel.color = value
+        self.cityBtn.color=value
+        self.listBtn.color = value
     def update_fonthead(self, instance, value):
         self.headerLabel.font_name = value
     def update_font(self, instance, value):
         self.theme_lbl.font_name = value
+        self.cityBtn.font_name=value
+        self.listBtn.font_name = value
 
     def map_pressed(self, instance):
-        sm.current = "tehranmap"
+        sm.current = setting_manager.city+"map"
     def line_pressed(self, instance):
-        sm.current = "tehranline"
+        sm.current = setting_manager.city+"line"
     def nav_pressed(self, instance):
-        sm.current = "tehrannav"
+        sm.current = setting_manager.city+"nav"
     def apimap_pressed(self, instance):
-        sm.current = "tehranapimap"
-class TehranAPIMap(Screen):
-    def __init__(self, **kwargs):
-        super(TehranAPIMap, self).__init__(**kwargs)
+        sm.current = setting_manager.city+"apimap"
+class APIMap(Screen):
+    def __init__(self,town, **kwargs):
+        self.town=town
+        super(APIMap, self).__init__(**kwargs)
     def on_kv_post(self, base_widget):
         with self.canvas.before:
             self.rect_color = Color(0.5, 0.5, 0.5, 1)
@@ -673,8 +729,8 @@ class TehranAPIMap(Screen):
         self.bind(size=self.update_rect, pos=self.update_rect)
         
         map_layout=FloatLayout( size_hint=(1, 0.8))
-
-        self.map=MapView(zoom=11, lat=35.715298, lon= 51.404343,pos=(0,Window.height*0.1))
+        self.lat,self.lon=townLatLon(self.town)
+        self.map=MapView(zoom=11, lat=self.lat, lon= self.lon,pos=(0,Window.height*0.1))
         
         self.map.map_source="osm"
         map_layout.add_widget(self.map)
@@ -710,8 +766,10 @@ class TehranAPIMap(Screen):
         settingBtn.bind(on_press=self.setting_pressed)
 
         inside_header = FloatLayout(pos_hint={'x': 0, 'y': 0.9}, size_hint=(1, 0.1))
-        self.headerLabel = Label(text=fa("نقشه متحرک"), font_size=50, font_name='Vazir-Bold', color=setting_manager.colorhead, pos_hint={'x': 0, 'y': 0})
+        self.headerLabel = Label(text=fa("نقشه متحرک"), font_size=50, font_name=setting_manager.fonthead ,color=setting_manager.colorhead, pos_hint={'x': 0, 'y': 0})
         setting_manager.bind(colorhead=self.update_theme)
+        
+        setting_manager.bind(fonthead=self.update_fonthead)
         inside_header.add_widget(self.headerLabel)
         self.add_widget(inside_header)
 
@@ -723,25 +781,27 @@ class TehranAPIMap(Screen):
 
     def update_theme(self, instance, value):
         self.headerLabel.color = value
-
+    def update_fonthead(self, instance, value):
+        self.headerLabel.font_name = value
     def map_pressed(self, instance):
-        sm.current = "tehranmap"
+        sm.current = self.town+"map"
     def line_pressed(self, instance):
-        sm.current = "tehranline"
+        sm.current = self.town+"line"
     def nav_pressed(self, instance):
-        sm.current = "tehrannav"
+        sm.current = self.town+"nav"
     def setting_pressed(self, instance):
         sm.current = "setting"
 
 
 
-class TehranMap(Screen):
-    def __init__(self, **kwargs):
-        super(TehranMap, self).__init__(**kwargs)
+class Map(Screen):
+    def __init__(self,town, **kwargs):
+        self.town=town
+        super(Map, self).__init__(**kwargs)
     def on_kv_post(self, base_widget):
         
         
-        file_path = os.path.join(script_dir, "tehran\\map.png")
+        file_path = os.path.join(script_dir, self.town+"\\map"+setting_manager.icon+".png")
         self.Grid=FloatLayout(size_hint=(1,.8))
         self.add_widget(self.Grid)
         self.stencil=StencilView(pos=(0,Window.height*0.1))
@@ -789,11 +849,19 @@ class TehranMap(Screen):
         settingBtn.bind(on_press=self.setting_pressed)
 
         inside_header = FloatLayout(pos_hint={'x': 0, 'y': 0.9}, size_hint=(1, 0.1))
-        headerLabel = Label(text=fa("نقشه رسمی"), font_size=50, font_name='Vazir-Bold', color="white", pos_hint={'x': 0, 'y': 0})
-        inside_header.add_widget(headerLabel)
+        self.headerLabel = Label(text=fa("نقشه رسمی"), font_size=50, font_name=setting_manager.fonthead, color=setting_manager.colorhead, pos_hint={'x': 0, 'y': 0})
+        inside_header.add_widget(self.headerLabel)
         self.add_widget(inside_header)
+        setting_manager.bind(colorhead=self.update_theme)
+        setting_manager.bind(fonthead=self.update_fonthead)
+        setting_manager.bind(icon=self.update_icon)
 
-
+    def update_icon(self, instance, value):
+        self.image.source = os.path.join(script_dir, self.town+"\\map"+value+".png")
+    def update_theme(self, instance, value):
+        self.headerLabel.color = value
+    def update_fonthead(self, instance, value):
+        self.headerLabel.font_name = value
 
     def update_rect(self, *args): 
         self.rect.pos = (0, self.height * 0.9) # Adjust position to be 90% down the screen 
@@ -810,16 +878,17 @@ class TehranMap(Screen):
 
 
     def mapapi_pressed(self, instance):
-        sm.current = "tehranapimap"
+        sm.current = self.town+"apimap"
     def line_pressed(self, instance):
-        sm.current = "tehranline"
+        sm.current = self.town+"line"
     def nav_pressed(self, instance):
-        sm.current = "tehrannav"
+        sm.current = self.town+"nav"
     def setting_pressed(self, instance):
         sm.current = "setting"
-class TehranNav(Screen):
-    def __init__(self, **kwargs):
-        super(TehranNav, self).__init__(**kwargs)
+class Nav(Screen):
+    def __init__(self,town, **kwargs):
+        self.town=town
+        super(Nav, self).__init__(**kwargs)
     def on_kv_post(self, base_widget):
         global screens
         with self.canvas.before:
@@ -857,24 +926,48 @@ class TehranNav(Screen):
         settingBtn.bind(on_press=self.setting_pressed)
 
         inside_header = FloatLayout(pos_hint={'x': 0, 'y': 0.9}, size_hint=(1, 0.1))
-        headerLabel = Label(text=fa("مسیریاب"), font_size=50, font_name='Vazir-Bold', color="white", pos_hint={'x': 0, 'y': 0})
-        inside_header.add_widget(headerLabel)
+        self.headerLabel = Label(text=fa("مسیریاب"), font_size=50, font_name=setting_manager.fonthead, color=setting_manager.colorhead, pos_hint={'x': 0, 'y': 0})
+        inside_header.add_widget(self.headerLabel)
         self.add_widget(inside_header)
 
 
         self.layout=GridLayout(pos_hint={'x': 0.25, 'y':0.3},size_hint=(0.5,0.45))
         self.layout.rows=3
         self.layout.cols=1
-        self.mabdaTextinp=TextInput(size_hint=(1,0.4),pos=(0.4,0),hint_text=fa("مبدا"),hint_text_color=(0.4, 0.4, 0.4, 1),font_name='Vazir',background_color="white",border=(4,4,4,4),base_direction='rtl',font_context='Vazir',text_language='fa')
-        self.maghsadTextinp=TextInput(size_hint=(1,0.4),pos=(0.4,0),hint_text=fa("مقصد"),hint_text_color=(0.4, 0.4, 0.4, 1),font_name='Vazir',background_color="white",border=(4,4,4,4),base_direction='rtl',font_context='Vazir',text_language='fa')
-        searchBtn=Button(size_hint=(1,0.2),text=fa('جستجو'), font_size=40,font_name='Vazir',background_color=(0,0,0.75,1))
+        self.mabdaTextinp=TextInput(size_hint=(1,0.4),pos=(0.4,0),hint_text=fa("مبدا"),hint_text_color=setting_manager.colorhead,foreground_color=setting_manager.colorhead,font_name=setting_manager.font,background_color=(0.4, 0.4, 0.4, 1),border=(4,4,4,4),base_direction='rtl',font_context=setting_manager.font,text_language='fa')
+        self.maghsadTextinp=TextInput(size_hint=(1,0.4),pos=(0.4,0),hint_text=fa("مقصد"),hint_text_color=setting_manager.colorhead,foreground_color=setting_manager.colorhead,font_name=setting_manager.font,background_color=(0.4, 0.4, 0.4, 1),border=(4,4,4,4),base_direction='rtl',font_context=setting_manager.font,text_language='fa')
+        self.searchBtn=Button(size_hint=(1,0.2),text=fa('جستجو'), font_size=40,font_name=setting_manager.font,background_color=(0,0,0.75,1))
         self.btnlayout=GridLayout(size_hint=(0.5,0.5),rows=1,cols=1)
         self.layout.add_widget(self.mabdaTextinp)
         self.layout.add_widget(self.maghsadTextinp)
-        self.btnlayout.add_widget(searchBtn)
+        self.btnlayout.add_widget(self.searchBtn)
         self.layout.add_widget(self.btnlayout)
         self.add_widget(self.layout)
-        searchBtn.bind(on_press=lambda instance: self.search_pressed(screens,instance))
+        self.searchBtn.bind(on_press=lambda instance: self.search_pressed(screens,instance))
+        setting_manager.bind(colorhead=self.update_theme)
+        setting_manager.bind(color=self.update_color)
+        setting_manager.bind(fonthead=self.update_fonthead)
+        setting_manager.bind(font=self.update_font)
+
+    def update_theme(self, instance, value):
+        self.headerLabel.color = value
+        self.mabdaTextinp.hint_text_color = value
+        self.maghsadTextinp.hint_text_color= value
+        self.mabdaTextinp.foreground_color=value
+        self.maghsadTextinp.foreground_color=value
+        
+    
+    def update_color(self,instance,value):
+        pass
+
+    def update_font(self, instance, value):
+        self.searchBtn.font_name = value
+        self.mabdaTextinp.font_name = value
+        self.mabdaTextinp.font_context = value
+        self.maghsadTextinp.font_name= value
+        self.maghsadTextinp.font_context= value
+    def update_fonthead(self, instance, value):
+        self.headerLabel.font_name = value
     def update_rect(self, *args): 
         self.rect.pos = (0, self.height * 0.9) # Adjust position to be 90% down the screen 
         self.rect.size = (self.width, self.height * 0.1)
@@ -882,21 +975,21 @@ class TehranNav(Screen):
         self.rect2.size = (self.width, self.height * 0.1)
 
     def mapapi_pressed(self, instance):
-        sm.current = "tehranapimap"
+        sm.current = self.town+"apimap"
     def line_pressed(self, instance):
-        sm.current = "tehranline"
+        sm.current = self.town+"line"
     def map_pressed(self, instance):
-        sm.current = "tehranmap"
+        sm.current =self.town+ "map"
     def setting_pressed(self, instance):
         sm.current = "setting"
     def search_pressed(self,screens, instance):
-        if self.mabdaTextinp.text!='' and self.maghsadTextinp.text!='' and finder(self.mabdaTextinp.text)!=False and finder(self.maghsadTextinp.text)!=False:
-            path,total_weight=dijkstra_with_total_weight(teh_graph, self.mabdaTextinp.text, self.maghsadTextinp.text)
+        if self.mabdaTextinp.text!='' and self.maghsadTextinp.text!='' and finder(self.mabdaTextinp.text,self.town)!=False and finder(self.maghsadTextinp.text,self.town)!=False:
+            path,total_weight=dijkstra_with_total_weight(all_town_graphs[self.town], self.mabdaTextinp.text, self.maghsadTextinp.text)
             
-            adads=line_finder(path)
+            adads=line_finder(path,self.town)
             
             
-            screens.append(LineWin(name="search", esm="tehran\\line" + str(1) + ".txt", adad=adads,rang=(1,1,1,1), t=True,stations=path))
+            screens.append(LineWin(name="search", esm=self.town+"\\line" + str(1) + ".txt", adad=adads,rang=(1,1,1,1), t=True,stations=path,town=self.town))
 
             sm.add_widget(screens[len(screens)-1])
             sm.current="search"
@@ -904,19 +997,19 @@ class TehranNav(Screen):
             self.maghsadTextinp.text=''
 
 class LineWin(Screen):
-    def __init__(self, esm,adad,rang,t,stations, **kwargs):
+    def __init__(self, esm,adad,rang,t,stations,town, **kwargs):
         super(LineWin, self).__init__(**kwargs)
         self.esm = esm
         self.t=t
         self.stations=stations
-        
+        self.town=town
         if self.t:
             self.adad = adad
             self.rang = rang
             besamt=[]
             start=0
-            for i in range(1,8):
-                file_path = os.path.join(script_dir, "tehran\\line"+str(i)+".txt")
+            for i in range(1,townnumlines[self.town]+1):
+                file_path = os.path.join(script_dir,self.town+"\\line"+str(i)+".txt")
                 linetxt= open(file_path,'r', encoding='utf-8')
                 linetxt=linetxt.read()
                 linetxt = linetxt.split('\n')
@@ -932,21 +1025,21 @@ class LineWin(Screen):
             lines = self.stations
             rangs=[]
             for i in range(len(self.stations)):
-                rangs.append(tehlinecolors[int(finder(self.stations[i])[0])-1])
+                rangs.append(towncolors[self.town][int(finder(self.stations[i],self.town)[0])-1])
         else:
             self.adad = adad
             self.rang = rang
             line = open(os.path.join(script_dir, self.esm), "r", encoding='utf-8')
             lines = line.readlines()
-            rangs=[tehlinecolors[int(self.adad)-1]]*len(lines)
+            rangs=[towncolors[self.town][int(self.adad)-1]]*len(lines)
             besamt=lines[len(lines)-1]
                 
         layoutscroll = GridLayout(cols=1, spacing=70, size_hint=(1,None))
         self.root = ScrollView(size_hint=(1, None), size=(Window.width, Window.height * 0.885))
         self.bind(size=self.update_rect, pos=self.update_rect)
-        StationBtns=[]
+        self.StationBtns=[]
         r=0
-        file_path_intersecs = os.path.join(script_dir, "tehran\\intersections.txt")
+        file_path_intersecs = os.path.join(script_dir, self.town+"\\intersections.txt")
         open_intersecs=open(file_path_intersecs,'r',encoding='utf-8')
         intersecs=open_intersecs.read().split('\n')
         k=0
@@ -954,21 +1047,21 @@ class LineWin(Screen):
         self.labels=[]
         for i in lines:
             if i in intersecs :
-                
-                StationBtns.append(MDIconButton(rounded_button=False,icon=os.path.join(script_dir, "tehran\\intersecs_pics\\"+str(intersecs.index(i)+1)+".png"),pos_hint={'center_x':0.7},icon_size="42sp"))
-                StationBtns[-1].pos_hint = {'center_x': 0.505, 'center_y': 0.5}
+                print(str(setting_manager.colorhead))
+                self.StationBtns.append(MDIconButton(rounded_button=False,icon=os.path.join(script_dir, self.town+"\\intersecs_pics\\"+str(setting_manager.colorhead)+" ("+str(intersecs.index(i)+1)+").png"),pos_hint={'center_x':0.7},icon_size="42sp"))
+                self.StationBtns[-1].pos_hint = {'center_x': 0.505, 'center_y': 0.5}
                 self.inters.append(i)
                 
             elif self.t:
-                StationBtns.append( BaseButton(line_width = 10,line_color=rangs[r],rounded_button=True,md_bg_color=(1,1,1,1)))
-                StationBtns[-1].pos_hint = {'center_x': 0.5, 'center_y': 0.5}
+                self.StationBtns.append( BaseButton(line_width = 10,line_color=rangs[r],rounded_button=True,md_bg_color=setting_manager.colorhead))
+                self.StationBtns[-1].pos_hint = {'center_x': 0.5, 'center_y': 0.5}
             else:
-                StationBtns.append( BaseButton(line_width = 10,line_color=self.rang,rounded_button=True,md_bg_color=(1,1,1,1)))
-                StationBtns[-1].pos_hint = {'center_x': 0.5, 'center_y': 0.5}
+                self.StationBtns.append( BaseButton(line_width = 10,line_color=self.rang,rounded_button=True,md_bg_color=setting_manager.colorhead))
+                self.StationBtns[-1].pos_hint = {'center_x': 0.5, 'center_y': 0.5}
 
-            label = Label(text=i, size_hint=(None, None), color=setting_manager.color, font_name="Vazir", font_size=47)
+            label = Label(text=i, size_hint=(None, None), color=setting_manager.color, font_name=setting_manager.font, font_size=47)
 
-            float_layout = FloatLayout(size_hint_y=None, height=StationBtns[len(StationBtns)-1].height)
+            float_layout = FloatLayout(size_hint_y=None, height=self.StationBtns[len(self.StationBtns)-1].height)
             if lines.index(i) % 2 == 0:
                 xlabel = 0.7
             else:
@@ -977,13 +1070,13 @@ class LineWin(Screen):
             
             label.pos_hint = {'x': xlabel, 'center_y': 0.1}
             self.labels.append(label)
-            float_layout.add_widget(StationBtns[-1])
+            float_layout.add_widget(self.StationBtns[-1])
             float_layout.add_widget(label)
             layoutscroll.add_widget(float_layout)
             if not self.t:
-                StationBtns[len(StationBtns)-1].bind(on_press=lambda instance, idx=len(StationBtns)-1: self.stationBtn_pressed(idx, self.adad))
+                self.StationBtns[len(self.StationBtns)-1].bind(on_press=lambda instance, idx=len(self.StationBtns)-1: self.stationBtn_pressed(idx, self.adad))
             else:
-                StationBtns[len(StationBtns)-1].bind(on_press=lambda instance, idx=int(finder(lines[len(StationBtns)-1])[2:])-1, idx2= int(finder(lines[len(StationBtns)-1])[0]) : self.stationBtn_pressed(idx, idx2))
+                self.StationBtns[len(self.StationBtns)-1].bind(on_press=lambda instance, idx=int(finder(lines[len(self.StationBtns)-1],self.town)[2])-1, idx2= int(finder(lines[len(self.StationBtns)-1],self.town)[0]) : self.stationBtn_pressed(idx, idx2))
             self.bind(size=lambda instance, value: self.update_label_size(label, self.width, self.height))
             r+=1
         
@@ -1010,9 +1103,9 @@ class LineWin(Screen):
             headertext="خطوط "+ adads[:len(adads)-3] 
         else:
             headertext="خط "+str(self.adad) +" به سمت: "+besamt
-        headerLabel = Label(text=headertext, font_size=50, font_name='Vazir-Bold', 
-                            color="white", pos_hint={'x': 0, 'y': 0})
-        inside_header.add_widget(headerLabel)
+        self.headerLabel = Label(text=headertext, font_size=50, font_name=setting_manager.fonthead, 
+                            color=setting_manager.colorhead, pos_hint={'x': 0, 'y': 0})
+        inside_header.add_widget(self.headerLabel)
         self.add_widget(inside_header)
         self.info_layout = FloatLayout(size_hint=(0.2, 0.1), pos_hint={'x': 0.8, 'y':0.1})
         self.infoBtn = MDIconButton(rounded_button=False,icon=os.path.join(script_dir, "more-info-icon"+setting_manager.icon+".png"),icon_size="42sp",pos_hint={'center_x':0.5})
@@ -1027,12 +1120,15 @@ class LineWin(Screen):
         self.backBtn.bind(on_press=self.back_pressed)
         layoutscroll.bind(minimum_height=layoutscroll.setter('height'))
         self.bind(size=self.layout_update)
-        self.StationBtns = StationBtns
+        
         self.layoutscroll = layoutscroll
         self.rangs = rangs
         self.bind(size=lambda instance,idx=self.layoutscroll: self.clearing_canvas_2(idx))
         setting_manager.bind(color=self.update_color)
+        setting_manager.bind(colorhead=self.update_colorhead)
         setting_manager.bind(icon=self.update_icon)
+        setting_manager.bind(font=self.update_font)
+        setting_manager.bind(fonthead=self.update_fonthead)
         Clock.schedule_interval(self.line_update, 0.1)
         
         
@@ -1040,7 +1136,18 @@ class LineWin(Screen):
     def update_color(self, instance, value):
         for i in range(len(self.labels)):
             self.labels[i].color=value
-            
+        
+    def update_font(self, instance, value):
+        for i in range(len(self.labels)):
+            self.labels[i].font_name=value
+    def update_fonthead(self, instance, value):
+        self.headerLabel.font_name=value
+        
+        
+    def update_colorhead(self, instance, value):
+        for i in range(0,len(self.StationBtns)):
+            self.StationBtns[i].md_bg_color=value
+        self.headerLabel.color=value
     def update_icon(self, instance, value):
         self.backBtn.icon="back"+value+".png"
         self.infoBtn.icon="more-info-icon"+value+".png"
@@ -1055,7 +1162,7 @@ class LineWin(Screen):
         
         
         layoutscroll.canvas.before.clear()
-        # Now, draw the lines between the buttons
+        
         with layoutscroll.canvas.before:
             Color(*rangs[0])
             Line(points=[self.center_x, StationBtns[1].center_y+StationBtns[1].center_y/10, self.center_x, StationBtns[1].center_y], width=10)
@@ -1068,14 +1175,14 @@ class LineWin(Screen):
                 
 
     def line_update(self,*args):
-        self.StationBtns = [[self.width*0.5,self.height*2.25]]+self.StationBtns[1:]
+        self.StationBtns2 = [[self.width*0.5,self.height*2.25]]+self.StationBtns[1:]
         
         self.update_positions_and_draw_lines()
 
     def update_label_size(self, label, width, height):
-        label.font_size = height * 0.02  # Adjust font size based on the height of the window
-        label.size_hint = (None, None)   # Ensure size_hint is None to manually set size
-        label.size = (width * 0.2, height * 0.05)  # Adjust the size based on the width and height of the window
+        label.font_size = height * 0.02  
+        label.size_hint = (None, None)   
+        label.size = (width * 0.2, height * 0.05)  
     def update_rect(self, *args):
         self.rect.pos = (0, self.height * 0.9)
         self.rect.size = (self.width, self.height * 0.1)
@@ -1085,23 +1192,23 @@ class LineWin(Screen):
 
     def update_positions_and_draw_lines(self, *args):
         self.layoutscroll.do_layout()
-
-        # Explicitly update button positions (ensure they are fully laid out)
-        
-        self.update_lines_colors(self.layoutscroll, self.StationBtns, self.rangs)
+        self.update_lines_colors(self.layoutscroll, self.StationBtns2, self.rangs)
 
 
     def back_pressed(self,*args):
-        sm.current="tehranline"
         if self.t:
+            sm.current=self.town+"nav"
             sm.remove_widget(screens[len(screens)-1])
             
             screens.pop()
+        else:
+            sm.current=self.town+"line"
+            
 
     def stationBtn_pressed(self,namd,adadd,*args):
-        sm.current=str(adadd)+','+str(namd+1)
+        sm.current=str(adadd)+','+str(namd+1)+self.town
         if self.t:
-            sm.remove_widget(screens[len(screens)-1])
+            sm.remove_widget(screens[-1])
             screens.pop()
             
     def info_pressed(self,*args):
@@ -1113,23 +1220,24 @@ class LineWin(Screen):
                 txt=''
             else:
                 txt="در ایستگاه های "+s+self.inters[-1]+" به سمت "+self.besamts[:len(self.besamts)-3]+ " خط عوض کنید."
-            popup=Popup(title=fa(txt),size_hint=(1,0.2),pos_hint={'center_x':0.5,'center_y':0.5})
-            popup.open()
+            self.popup=Popup(title=fa(txt),size_hint=(1,0.2),pos_hint={'center_x':0.5,'center_y':0.5})
+            self.popup.open()
         else:
-            popup=Popup(title=fa("زمانبندی حرکت قطار ها"),size_hint=(1,0.6),pos_hint={'center_x':0.5,'center_y':0.5})
-            popup.add_widget(Image(source=os.path.join(script_dir, "tehran\\headway_pics\\"+self.adad+".jpg")))
-            popup.open()
+            self.popup=Popup(title=fa("زمانبندی حرکت قطار ها"),size_hint=(1,0.6),pos_hint={'center_x':0.5,'center_y':0.5})
+            self.popup.add_widget(Image(source=os.path.join(script_dir, self.town+"\\headway_pics\\"+self.adad+".jpg")))
+            self.popup.open()
 
 
 
 
 class StationWin(Screen):
-    def __init__(self,nam,rang,adad,esm,**kwargs):
+    def __init__(self,nam,rang,adad,esm,town,**kwargs):
         super(StationWin, self).__init__(**kwargs)
         self.rang = rang
         self.adad = adad
         self.esm = esm
         self.nam = nam
+        self.town=town
         with self.canvas.before:
             self.rect_color = Color(*self.rang)
             self.rect = Rectangle()
@@ -1140,8 +1248,8 @@ class StationWin(Screen):
         
         staName=staLine[0]
         inside_header = RelativeLayout(size_hint=(1, 0.1), pos_hint={'top': 1})
-        headerLabel = Label(text=fa(staName), font_size=50, font_name='Vazir-Bold', color="white", pos_hint={'x': 0, 'y': 0})
-        inside_header.add_widget(headerLabel)
+        self.headerLabel = Label(text=fa(staName), font_size=50, font_name=setting_manager.fonthead, color=setting_manager.colorhead, pos_hint={'x': 0, 'y': 0})
+        inside_header.add_widget(self.headerLabel)
         self.add_widget(inside_header)
 
         staEnters=staLine[1]
@@ -1150,35 +1258,49 @@ class StationWin(Screen):
         self.layout = GridLayout(size_hint=(1,.9))
         self.layout.rows=6
         self.layout.cols=1
-        self.lblenters=Label(text=fa("تعداد ورودی ها :"),color=setting_manager.color, font_name="Vazir-Bold", font_size=50)
+        self.lblenters=Label(text=fa("تعداد ورودی ها :"),color=setting_manager.color, font_name=setting_manager.fonthead, font_size=50)
         self.layout.add_widget(self.lblenters)
-        self.enters=Label(text=fa(staEnters),color=setting_manager.color, font_name="Vazir", font_size=45)
+        self.enters=Label(text=fa(staEnters),color=setting_manager.color, font_name=setting_manager.font, font_size=45)
         self.layout.add_widget(self.enters)
-        self.lblatms=Label(text=fa("تعداد خودپرداز ها :"),color=setting_manager.color, font_name="Vazir-Bold", font_size=50)
+        self.lblatms=Label(text=fa("تعداد خودپرداز ها :"),color=setting_manager.color, font_name=setting_manager.fonthead, font_size=50)
         self.layout.add_widget(self.lblatms)
-        self.atms=Label(text=fa(staATMs),color=setting_manager.color, font_name="Vazir", font_size=45)
+        self.atms=Label(text=fa(staATMs),color=setting_manager.color, font_name=setting_manager.font, font_size=45)
         self.layout.add_widget(self.atms)
-        self.lblplaces=Label(text=fa("مکان های مهم اطراف :"),color=setting_manager.color, font_name="Vazir-Bold", font_size=50)
+        self.lblplaces=Label(text=fa("مکان های مهم اطراف :"),color=setting_manager.color, font_name=setting_manager.fonthead, font_size=50)
         self.layout.add_widget(self.lblplaces)
-        self.places=Label(text=fa(staPlaces),color=setting_manager.color, font_name="Vazir", font_size=45)
+        self.places=Label(text=fa(staPlaces),color=setting_manager.color, font_name=setting_manager.font, font_size=45)
         self.layout.add_widget(self.places)
 
         self.add_widget(self.layout)
 
         self.back_layout = FloatLayout(size_hint=(0.2, 0.1), pos_hint={'x': 0.05, 'top': 1}) 
-        self.backBtn = Button(background_normal="back"+setting_manager.icon+".png") 
+        self.backBtn = MDIconButton(icon="back"+setting_manager.icon+".png", icon_size="42sp")
         self.back_layout.add_widget(self.backBtn) 
         self.add_widget(self.back_layout)
         self.backBtn.bind(on_press=lambda instance,idx=self.nam: self.back_pressed(idx))
         setting_manager.bind(color=self.update_color)
+        setting_manager.bind(colorhead=self.update_colorhead)
         setting_manager.bind(icon=self.update_icon)
+        setting_manager.bind(font=self.update_font)
+        setting_manager.bind(fonthead=self.update_fonthead)
+
+    def update_fonthead(self, instance, value):
+        self.lblatms.font_name = value
+        self.lblenters.font_name=value
+        self.lblplaces.font_name=value
+        self.headerLabel.font_name = value
+
+    def update_font(self, instance, value):
+        self.atms.font_name = value
+        self.enters.font_name=value
+        self.places.font_name=value
 
     def update_rect(self, *args): 
         self.rect.pos = (0, self.height * 0.9) # Adjust position to be 90% down the screen 
         self.rect.size = (self.width, self.height * 0.1)
 
     def back_pressed(self,namd,*args):
-        sm.current="tehline"+str(namd)
+        sm.current=self.town+"line"+str(namd)
     
     def update_color(self, instance, value):
         self.lblenters.color=value
@@ -1195,33 +1317,48 @@ class StationWin(Screen):
         
     def update_icon(self, instance, value):
         self.backBtn.icon="back"+value+".png"
-        
+    
+    def update_colorhead(self, instance, value):
+        self.headerLabel.color=value
 
 class MyApp(MDApp):
     def build(self):
         global screens
-        tehlinecolors = [(1,0,0,1),(0,0,1,1),(0,0.8,1,1),(1,0.89,0,1),(0,0.5,0,1),(1,0.45,0.85,1),(0.65,0,1,1)]
-        
+        tehranlinecolors = [(1,0,0,1),(0,0,1,1),(0,0.8,1,1),(1,0.89,0,1),(0,0.5,0,1),(1,0.45,0.85,1),(0.65,0,1,1)]
+        mashhadlinecolors= [(0,0.5,0,1),(0,0,1,1),(1,0,0,1)]
+        isfahanlinecolors=[(0,0.5,0,1)]
+        shirazlinecolors=[(0,0.5,0,1),(0,0.5,0,1)]
+        tabrizlinecolors=[(0,0.5,0,1)]
+        karajlinecolors=[(0,0.5,0,1),(0,0.5,0,1)]
+        towns=["tehran","mashhad","isfahan","shiraz","tabriz","karaj"]
+        towncolors={
+            1:tehranlinecolors,2:mashhadlinecolors,3:isfahanlinecolors,4:shirazlinecolors,5:tabrizlinecolors,6:karajlinecolors
+        }
+        t=0
         # Adding LineWin screens
-        for i in range(1, 8):
-            screens.append(LineWin(name="tehline" + str(i), esm="tehran\\line" + str(i) + ".txt", adad=str(i), rang=tehlinecolors[i - 1],t=False,stations=[]))
-        
+        for j in (7,3,1,2,1,2):
+            for i in (range(1, j+1)):
+                screens.append(LineWin(name=towns[t]+"line" + str(i), esm=towns[t]+"\\line" + str(i) + ".txt", adad=str(i), rang=towncolors[t+1][i - 1],t=False,stations=[],town=towns[t]))
+            t+=1
+            
         # Adding StationWin screens
-        for i in range(1, 8):
-            line = open(os.path.join(script_dir, "tehran\\line" + str(i) + ".txt"), "r", encoding='utf-8')
-            lines = line.readlines()
-            for j in range(1, len(lines) + 1):
-                screens.append(StationWin(name=str(i) + ',' + str(j), nam=i, adad=j, rang=tehlinecolors[i - 1], esm="tehran\\line" + str(i) + "info.txt"))
-        
+        t=0
+        for k in (7,3,1,2,1,2):
+            for i in range(1, k+1):
+                line = open(os.path.join(script_dir, towns[t]+"\\line" + str(i) + ".txt"), "r", encoding='utf-8')
+                lines = line.readlines()
+                for j in range(1, len(lines) + 1):
+                    screens.append(StationWin(name=str(i) + ',' + str(j)+towns[t], nam=i, adad=j, rang=towncolors[t+1][i - 1], esm=towns[t]+"\\line" + str(i) + "info.txt",town=towns[t]))
+            t+=1
         # Adding other screens
-        screens += [
-            WelcomeWindow(name="welcome"),
-            TehranLineWin(name="tehranline"),
-            TehranMap(name="tehranmap"),
-            TehranAPIMap(name="tehranapimap"),
-            TehranNav(name="tehrannav"), 
-            Setting(name="setting")
-        ]
+        screens+=[WelcomeWindow(name="welcome"),Setting(name="setting")]
+        for i in range(6):
+            screens += [
+                LinesPage(name=towns[i]+"line",town=towns[i]),
+                Map(name=towns[i]+"map",town=towns[i]),
+                APIMap(name=towns[i]+"apimap",town=towns[i]),
+                Nav(name=towns[i]+"nav",town=towns[i]) 
+            ]
         
         # Adding all screens to the ScreenManager
         for screen in screens:
