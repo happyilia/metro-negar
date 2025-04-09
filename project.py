@@ -10,10 +10,10 @@ tehlinecolors = [(1,0,0,1),(0,0,1,1),(0,0.8,1,1),(1,0.89,0,1),(0,0.5,0,1),(1,0.4
 theme=(1,1,1,1)
 tehranlinecolors = [(1,0,0,1),(0,0,1,1),(0,0.8,1,1),(1,0.89,0,1),(0,0.5,0,1),(1,0.45,0.85,1),(0.65,0,1,1),7]
 mashhadlinecolors= [(0,0.5,0,1),(0,0,1,1),(1,0,0,1),3]
-isfahanlinecolors=[(0,0.5,0,1),1]
-shirazlinecolors=[(0,0.5,0,1),(0,0.5,0,1),2]
-tabrizlinecolors=[(0,0.5,0,1),1]
-karajlinecolors=[(0,0.5,0,1),(0,0.5,0,1),2]
+isfahanlinecolors=[(1,0,0,1),1]
+shirazlinecolors=[(1,0,0,1),(0,0.5,0,1),2]
+tabrizlinecolors=[(0.016, 0.686, 0.769,1),1]
+karajlinecolors=[(0.78, 0.8, 0.075,1),(0.016, 0.686, 0.769,1),2]
 
 towncolors={
     "tehran":tehranlinecolors,"mashhad":mashhadlinecolors,"isfahan":isfahanlinecolors,"shiraz":shirazlinecolors,"tabriz":tabrizlinecolors,"karaj":karajlinecolors
@@ -118,10 +118,10 @@ def line_finder(pot,town):
 def towncolor(town):
     tehranlinecolors = [(1,0,0,1),(0,0,1,1),(0,0.8,1,1),(1,0.89,0,1),(0,0.5,0,1),(1,0.45,0.85,1),(0.65,0,1,1),7]
     mashhadlinecolors= [(0,0.5,0,1),(0,0,1,1),(1,0,0,1),3]
-    isfahanlinecolors=[(0,0.5,0,1),1]
-    shirazlinecolors=[(0,0.5,0,1),(0,0.5,0,1),2]
-    tabrizlinecolors=[(0,0.5,0,1),1]
-    karajlinecolors=[(0,0.5,0,1),(0,0.5,0,1),2]
+    isfahanlinecolors=[(1,0,0,1),1]
+    shirazlinecolors=[(1,0,0,1),(0,0.5,0,1),2]
+    tabrizlinecolors=[(0.016, 0.686, 0.769,1),1]
+    karajlinecolors=[(0.78, 0.8, 0.075,1),(0.016, 0.686, 0.769,1),2]
     towns=["tehran","mashhad","isfahan","shiraz","tabriz","karaj"]
     towncolors={
         "tehran":tehranlinecolors,"mashhad":mashhadlinecolors,"isfahan":isfahanlinecolors,"shiraz":shirazlinecolors,"tabriz":tabrizlinecolors,"karaj":karajlinecolors
@@ -131,10 +131,19 @@ def towncolor(town):
 def townbtnspos(town):
     return [0.8,0.6875,0.575,0.4625,0.35,0.2375,0.1250]
 
+townlatslons={
+    "tehran":(35.715298,51.404343),
+    "mashhad":(36.310699,59.599457),
+    "isfahan":(32.661343,51.680374),
+    "shiraz":(29.591768,52.583698),
+    "tabriz":(38.066666,46.299999),
+    "karaj":(35.855938,50.961750)
+}
+
 def townLatLon(town):
-    if town=="mashhad":
-        return (36.310699,59.599457)
-    return (35.715298,51.404343)
+    
+    return townlatslons[town]
+    
 
 #tehran_graph
 tehran_graph={}
@@ -190,11 +199,119 @@ for i in range(1,3):
         elif linetxt[j] in mashhad_stations:
             mashhad_graph[linetxt[j]].update({linetxt[j+1]:5,linetxt[j-1]:5})
 
-print(mashhad_graph)
+#mashhad_graph
+isfahan_graph={}
+isfahan_stations=[]
+o=0
+for i in range(1,1):
+    file_path = os.path.join(script_dir, "isfahan\\line"+str(i)+".txt")
+    linetxt= open(file_path,'r', encoding='utf-8')
+    linetxt=linetxt.read()
+    linetxt = linetxt.split('\n')
+    for j in range(len(linetxt)):
+        if linetxt[j] not in isfahan_stations and j!=0 and j!=len(linetxt)-1:
+            isfahan_graph[linetxt[j]] = {}
+            isfahan_graph[linetxt[j]][linetxt[j+1]]=5
+            isfahan_graph[linetxt[j]][linetxt[j-1]]=5
+            isfahan_stations.append(linetxt[j])
+        elif j==0:
+            isfahan_graph[linetxt[j]] = {}
+            isfahan_graph[linetxt[j]][linetxt[j + 1]] = 5
+            isfahan_stations.append(linetxt[j])
+        elif j==len(linetxt)-1:
+            isfahan_graph[linetxt[j]] = {}
+            isfahan_graph[linetxt[j]][linetxt[j-1]]=5
+            
+            isfahan_stations.append(linetxt[j])
+        elif linetxt[j] in isfahan_stations:
+            isfahan_graph[linetxt[j]].update({linetxt[j+1]:5,linetxt[j-1]:5})
+
+shiraz_graph={}
+shiraz_stations=[]
+o=0
+for i in range(1,2):
+    file_path = os.path.join(script_dir, "shiraz\\line"+str(i)+".txt")
+    linetxt= open(file_path,'r', encoding='utf-8')
+    linetxt=linetxt.read()
+    linetxt = linetxt.split('\n')
+    for j in range(len(linetxt)):
+        if linetxt[j] not in shiraz_stations and j!=0 and j!=len(linetxt)-1:
+            shiraz_graph[linetxt[j]] = {}
+            shiraz_graph[linetxt[j]][linetxt[j+1]]=5
+            shiraz_graph[linetxt[j]][linetxt[j-1]]=5
+            shiraz_stations.append(linetxt[j])
+        elif j==0:
+            shiraz_graph[linetxt[j]] = {}
+            shiraz_graph[linetxt[j]][linetxt[j + 1]] = 5
+            shiraz_stations.append(linetxt[j])
+        elif j==len(linetxt)-1:
+            shiraz_graph[linetxt[j]] = {}
+            shiraz_graph[linetxt[j]][linetxt[j-1]]=5
+            
+            shiraz_stations.append(linetxt[j])
+        elif linetxt[j] in shiraz_stations:
+            shiraz_graph[linetxt[j]].update({linetxt[j+1]:5,linetxt[j-1]:5})
+
+tabriz_graph={}
+tabriz_stations=[]
+o=0
+for i in range(1,1):
+    file_path = os.path.join(script_dir, "tabriz\\line"+str(i)+".txt")
+    linetxt= open(file_path,'r', encoding='utf-8')
+    linetxt=linetxt.read()
+    linetxt = linetxt.split('\n')
+    for j in range(len(linetxt)):
+        if linetxt[j] not in tabriz_stations and j!=0 and j!=len(linetxt)-1:
+            tabriz_graph[linetxt[j]] = {}
+            tabriz_graph[linetxt[j]][linetxt[j+1]]=5
+            tabriz_graph[linetxt[j]][linetxt[j-1]]=5
+            tabriz_stations.append(linetxt[j])
+        elif j==0:
+            tabriz_graph[linetxt[j]] = {}
+            tabriz_graph[linetxt[j]][linetxt[j + 1]] = 5
+            tabriz_stations.append(linetxt[j])
+        elif j==len(linetxt)-1:
+            tabriz_graph[linetxt[j]] = {}
+            tabriz_graph[linetxt[j]][linetxt[j-1]]=5
+            
+            tabriz_stations.append(linetxt[j])
+        elif linetxt[j] in tabriz_stations:
+            tabriz_graph[linetxt[j]].update({linetxt[j+1]:5,linetxt[j-1]:5})
+
+karaj_graph={}
+karaj_stations=[]
+o=0
+for i in range(1,1):
+    file_path = os.path.join(script_dir, "karaj\\line"+str(i)+".txt")
+    linetxt= open(file_path,'r', encoding='utf-8')
+    linetxt=linetxt.read()
+    linetxt = linetxt.split('\n')
+    for j in range(len(linetxt)):
+        if linetxt[j] not in karaj_stations and j!=0 and j!=len(linetxt)-1:
+            karaj_graph[linetxt[j]] = {}
+            karaj_graph[linetxt[j]][linetxt[j+1]]=5
+            karaj_graph[linetxt[j]][linetxt[j-1]]=5
+            karaj_stations.append(linetxt[j])
+        elif j==0:
+            karaj_graph[linetxt[j]] = {}
+            karaj_graph[linetxt[j]][linetxt[j + 1]] = 5
+            karaj_stations.append(linetxt[j])
+        elif j==len(linetxt)-1:
+            karaj_graph[linetxt[j]] = {}
+            karaj_graph[linetxt[j]][linetxt[j-1]]=5
+            
+            karaj_stations.append(linetxt[j])
+        elif linetxt[j] in karaj_stations:
+            karaj_graph[linetxt[j]].update({linetxt[j+1]:5,linetxt[j-1]:5})
+
 
 all_town_graphs={
     "tehran":tehran_graph,
-    "mashhad":mashhad_graph
+    "mashhad":mashhad_graph,
+    "isfahan":isfahan_graph,
+    "shiraz":shiraz_graph,
+    "tabriz":tabriz_graph,
+    "karaj":karaj_graph
 }
 class Node:
   def __init__(self,x_coord,y_coord):
@@ -257,41 +374,39 @@ class WelcomeWindow(Screen):
         setting_manager.bind(fonthead=self.update_fonthead)
 
         self.tehran_btn = MDIconButton(icon="tehranlogo.png",icon_size="55sp")
-        self.tehran_btn.bind(on_press=self.pressedtbtn)
+        self.tehran_btn.bind(on_press=lambda instance,idx="tehran": self.pressed(idx))
         self.insidebtn.add_widget(self.tehran_btn)
 
         self.mashhad_btn = MDIconButton(icon="mashhadlogo.png",icon_size="55sp")
-        self.mashhad_btn.bind(on_press=self.pressedmashhadbtn)
+        self.mashhad_btn.bind(on_press=lambda instance,idx="mashhad": self.pressed(idx))
         self.insidebtn.add_widget(self.mashhad_btn)
 
         self.isfahan_btn = MDIconButton(icon="isfahanlogo.png",icon_size="55sp")
-        self.isfahan_btn.bind(on_press=self.pressed)
+        self.isfahan_btn.bind(on_press=lambda instance,idx="isfahan": self.pressed(idx))
         self.insidebtn.add_widget(self.isfahan_btn)
 
         self.shiraz_btn = MDIconButton(icon="shirazlogo.png",icon_size="55sp")
-        self.shiraz_btn.bind(on_press=self.pressed)
+        self.shiraz_btn.bind(on_press=lambda instance,idx="shiraz": self.pressed(idx))
         self.insidebtn.add_widget(self.shiraz_btn)
 
         self.tabriz_btn = MDIconButton(icon="tabrizlogo.png",icon_size="55sp")
-        self.tabriz_btn.bind(on_press=self.pressed)
+        self.tabriz_btn.bind(on_press=lambda instance,idx="tabriz": self.pressed(idx))
         self.insidebtn.add_widget(self.tabriz_btn)
 
         self.karaj_btn = MDIconButton(icon="karajlogo.png",icon_size="55sp")
-        self.karaj_btn.bind(on_press=self.pressed)
+        self.karaj_btn.bind(on_press=lambda instance,idx="karaj": self.pressed(idx))
         self.insidebtn.add_widget(self.karaj_btn)
 
         self.inside.add_widget(self.inside2)
         self.inside.add_widget(self.insidebtn)
         self.add_widget(self.inside)
 
-    def pressedtbtn(self, intance):
-        sm.current = "tehranline"
-        setting_manager.city="tehran"
-    def pressedmashhadbtn(self, intance):
-        sm.current = "mashhadline"
-        setting_manager.city="mashhad"
-    def pressed(self, intance):
-        print("pressed")
+    
+        
+    
+    def pressed(self,town, *kwargs):
+        sm.current = town+"line"
+        setting_manager.city=town
 
     def update_rect(self, *args): 
         self.top_rect.pos = (0, self.height * 0.9) 
@@ -505,7 +620,7 @@ class LinesPage(Screen):
     #     print(instance)
     #     self.searchbox.text = self.ser_labels[instance].text
     def on_label_touch_down(self, instance, touch, match):
-        
+        print(touch.pos, instance)
         if touch.collide_point(*touch.pos):  # Ensure touch is on the label
             print(f"Label clicked with text: {instance}")   
             return True
@@ -522,9 +637,9 @@ class LinesPage(Screen):
                 label = Label(text=fa(match), font_size=30, font_name=setting_manager.font, color="black")
                 
                 # Bind the touch event properly using partial
-                label.bind(on_touch_down=partial(self.on_label_touch_down, match))
                 self.ser_labels.append(label)
-                self.search_results_box.add_widget(label)
+                self.ser_labels[-1].bind(on_touch_down=partial(self.on_label_touch_down, match))
+                self.search_results_box.add_widget(self.ser_labels[-1])
 
             self.search_results_scroll.size_hint_y = None  
             self.search_results_scroll.height = self.searchbox.height * 2 
@@ -1324,12 +1439,12 @@ class StationWin(Screen):
 class MyApp(MDApp):
     def build(self):
         global screens
-        tehranlinecolors = [(1,0,0,1),(0,0,1,1),(0,0.8,1,1),(1,0.89,0,1),(0,0.5,0,1),(1,0.45,0.85,1),(0.65,0,1,1)]
-        mashhadlinecolors= [(0,0.5,0,1),(0,0,1,1),(1,0,0,1)]
-        isfahanlinecolors=[(0,0.5,0,1)]
-        shirazlinecolors=[(0,0.5,0,1),(0,0.5,0,1)]
-        tabrizlinecolors=[(0,0.5,0,1)]
-        karajlinecolors=[(0,0.5,0,1),(0,0.5,0,1)]
+        tehranlinecolors = [(1,0,0,1),(0,0,1,1),(0,0.8,1,1),(1,0.89,0,1),(0,0.5,0,1),(1,0.45,0.85,1),(0.65,0,1,1),7]
+        mashhadlinecolors= [(0,0.5,0,1),(0,0,1,1),(1,0,0,1),3]
+        isfahanlinecolors=[(1,0,0,1),1]
+        shirazlinecolors=[(1,0,0,1),(0,0.5,0,1),2]
+        tabrizlinecolors=[(0.016, 0.686, 0.769,1),1]
+        karajlinecolors=[(0.78, 0.8, 0.075,1),(0.016, 0.686, 0.769,1),2]
         towns=["tehran","mashhad","isfahan","shiraz","tabriz","karaj"]
         towncolors={
             1:tehranlinecolors,2:mashhadlinecolors,3:isfahanlinecolors,4:shirazlinecolors,5:tabrizlinecolors,6:karajlinecolors
