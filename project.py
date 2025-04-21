@@ -1,6 +1,5 @@
 from imports import *
-from kivymd.uix.menu import MDDropdownMenu
-from kivymd.uix.button.button import MDRaisedButton
+
 
 
 script_dir = os.path.dirname(os.path.abspath(__file__))
@@ -846,6 +845,12 @@ class APIMap(Screen):
         map_layout=FloatLayout( size_hint=(1, 0.8))
         self.lat,self.lon=townLatLon(self.town)
         self.map=MapView(zoom=11, lat=self.lat, lon= self.lon,pos=(0,Window.height*0.1))
+        file_path = os.path.join(script_dir, "tehran"+"\\line"+"1"+"cords.txt")
+        line = open(file_path,'r')
+        line=line.readlines()
+        for j in range(len(line)):
+            marker=MapMarker(lat=float(line[j][1:8]),lon=float(line[j][10:17]),source="mapmarker.png",size=(32,32),anchor_x=0.5,anchor_y=0)
+            self.map.add_widget(marker)
         
         self.map.map_source="osm"
         map_layout.add_widget(self.map)
