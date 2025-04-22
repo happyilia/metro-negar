@@ -1,0 +1,29 @@
+(35.804381, 51.433950)   # Tajrish
+(35.793416, 51.435134)  # Gheytariyeh
+(35.785278, 51.435833)  # Shahid Sadr
+(35.772778, 51.437861)  # Gholhak
+(35.762778, 51.444444)  # Doctor Shariati
+(35.760100, 51.433611)  # Mirdamad
+(35.756472, 51.426222)  # Shahid Haghani
+(35.747400, 51.428122)  # Shahid Hemmat
+(35.739978, 51.427928)  # Mosalla Imam Khomeini
+(35.731028, 51.427000)  # Shahid Beheshti
+(35.724389, 51.427556)  # Shahid Mofatteh
+(35.716022, 51.426008)  # Haft-e Tir
+(35.707167, 51.425556)  # Taleghani
+(35.701667, 51.426111)  # Darvazeh Dowlat
+(35.693056, 51.424722)  # Saadi
+(35.685667, 51.419611)  # Imam Khomeini
+(35.678000, 51.417472)  # 15khordad
+(35.673194, 51.416667)  # Khayam
+(35.667778, 51.415639)  # Mohammadiyeh
+(35.658256, 51.414108)  # Shush
+(35.647864, 51.415606)  # Payane Jonoob
+(35.640900, 51.414978)  # Shahid Bokharaei
+(35.628425, 51.416167)  # Ali Abad
+(35.618661, 51.418736)  # Javanmard-e Ghassab
+(35.594972, 51.422278)  # Shahr-e Rey
+(35.559800, 51.399300)  # Palayeshgah
+(35.547447, 51.382583)  # Shahed - Bagher Shahr
+(35.545028, 51.373000)  # Haram-e Motahhar-e Emam Khomeini
+(35.521580, 51.369260)  # Kahrizak
