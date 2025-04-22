@@ -615,13 +615,11 @@ class LinesPage(Screen):
     def setting_pressed(self, instance):
         sm.current = "setting"
     
-    # def on_label_touch_down(self, instance, touch, match):
-    #     print(instance)
-    #     self.searchbox.text = self.ser_labels[instance].text
+    
     def on_label_touch_down(self, instance, touch, match):
-        print(touch.pos, instance)
+        
         if touch.collide_point(*touch.pos):  # Ensure touch is on the label
-            print(f"Label clicked with text: {instance}")   
+               
             return True
         return False 
 
@@ -841,16 +839,20 @@ class APIMap(Screen):
             self.rect2 = Rectangle()
         
         self.bind(size=self.update_rect, pos=self.update_rect)
-        
+        linegraph={
+            "tehran":["red","blue","lightblue","yellow","green","pink","purple"]
+        }
         map_layout=FloatLayout( size_hint=(1, 0.8))
         self.lat,self.lon=townLatLon(self.town)
         self.map=MapView(zoom=11, lat=self.lat, lon= self.lon,pos=(0,Window.height*0.1))
-        file_path = os.path.join(script_dir, "tehran"+"\\line"+"1"+"cords.txt")
-        line = open(file_path,'r')
-        line=line.readlines()
-        for j in range(len(line)):
-            marker=MapMarker(lat=float(line[j][1:8]),lon=float(line[j][10:17]),source="mapmarker.png",size=(32,32),anchor_x=0.5,anchor_y=0)
-            self.map.add_widget(marker)
+        if (self.town=="tehran"):
+            for i in range(1,8):
+                file_path = os.path.join(script_dir, "tehran"+"\\line"+str(i)+"cords.txt")
+                line = open(file_path,'r')
+                line=line.readlines()
+                for j in range(len(line)):
+                    marker=MapMarker(lat=float(line[j][1:10]),lon=float(line[j][12:19]),source="mapmarker"+linegraph[self.town][i-1]+".png",size=(32,32),anchor_x=0.5,anchor_y=0)
+                    self.map.add_widget(marker)
         
         self.map.map_source="osm"
         map_layout.add_widget(self.map)
@@ -1167,7 +1169,7 @@ class LineWin(Screen):
         self.labels=[]
         for i in lines:
             if i in intersecs :
-                print(str(setting_manager.colorhead))
+                
                 self.StationBtns.append(MDIconButton(rounded_button=False,icon=os.path.join(script_dir, self.town+"\\intersecs_pics\\"+str(setting_manager.colorhead)+" ("+str(intersecs.index(i)+1)+").png"),pos_hint={'center_x':0.7},icon_size="42sp"))
                 self.StationBtns[-1].pos_hint = {'center_x': 0.505, 'center_y': 0.5}
                 self.inters.append(i)

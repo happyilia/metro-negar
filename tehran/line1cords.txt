@@ -1,27 +1,29 @@
-(35.8044, 51.4214)  # Tajrish
-(35.7914, 51.4214)  # Gheytariyeh
-(35.7733, 51.4214)  # Shahid Sadr
-(35.7728, 51.4381)  # Gholhak
-(35.7480, 51.4214)  # Doctor Shariati
-(35.7600, 51.4336)  # Mirdamad
-(35.7558, 51.4261)  # Shahid Haghani
-(35.7475, 51.4281)  # Shahid Hemmat
-(35.7373, 51.4284)  # Mosalla Imam Khomeini
-(35.7316, 51.4268)  # Shahid Beheshti
-(35.7244, 51.4278)  # Shahid Mofatteh
-(35.7095, 51.4239)  # Haft-e Tir
-(35.7072, 51.4260)  # Taleghani
-(35.7008, 51.4235)  # Darvazeh Dowlat
-(35.6931, 51.4247)  # Saadi
-(35.6869, 51.4235)  # Imam Khomeini
-(35.6800, 51.4235)  # Mohammadiyeh
-(35.6735, 51.4235)  # Shush
-(35.6670, 51.4235)  # Payane Jonoob
-(35.6605, 51.4235)  # Shahid Bokharaei
-(35.6540, 51.4235)  # Ali Abad
-(35.6475, 51.4235)  # Javanmard-e Ghassab
-(35.6410, 51.4235)  # Shahr-e Rey
-(35.6345, 51.4235)  # Palayeshgah
-(35.6280, 51.4235)  # Shahed - Bagher Shahr
-(35.6215, 51.4235)  # Haram-e Motahhar-e Emam Khomeini
-(35.6150, 51.4235)  # Kahrizak
+(35.804381, 51.433950)   # Tajrish
+(35.793416, 51.435134)  # Gheytariyeh
+(35.785278, 51.435833)  # Shahid Sadr
+(35.772778, 51.437861)  # Gholhak
+(35.762778, 51.444444)  # Doctor Shariati
+(35.760100, 51.433611)  # Mirdamad
+(35.756472, 51.426222)  # Shahid Haghani
+(35.747400, 51.428122)  # Shahid Hemmat
+(35.739978, 51.427928)  # Mosalla Imam Khomeini
+(35.731028, 51.427000)  # Shahid Beheshti
+(35.724389, 51.427556)  # Shahid Mofatteh
+(35.716022, 51.426008)  # Haft-e Tir
+(35.707167, 51.425556)  # Taleghani
+(35.701667, 51.426111)  # Darvazeh Dowlat
+(35.693056, 51.424722)  # Saadi
+(35.685667, 51.419611)  # Imam Khomeini
+(35.678000, 51.417472)  # 15khordad
+(35.673194, 51.416667)  # Khayam
+(35.667778, 51.415639)  # Mohammadiyeh
+(35.658256, 51.414108)  # Shush
+(35.647864, 51.415606)  # Payane Jonoob
+(35.640900, 51.414978)  # Shahid Bokharaei
+(35.628425, 51.416167)  # Ali Abad
+(35.618661, 51.418736)  # Javanmard-e Ghassab
+(35.594972, 51.422278)  # Shahr-e Rey
+(35.559800, 51.399300)  # Palayeshgah
+(35.547447, 51.382583)  # Shahed - Bagher Shahr
+(35.545028, 51.373000)  # Haram-e Motahhar-e Emam Khomeini
+(35.521580, 51.369260)  # Kahrizak
