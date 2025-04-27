@@ -41,3 +41,6 @@ from kivy.properties import ObjectProperty, ListProperty, StringProperty
 from kivy.event import EventDispatcher 
 from kivymd.uix.menu import MDDropdownMenu
 from kivymd.uix.button.button import MDRaisedButton
+from plyer import gps, compass
+from kivy.graphics import Rotate
+from kivy.animation import Animation

@@ -839,27 +839,49 @@ class APIMap(Screen):
             self.rect2 = Rectangle()
         
         self.bind(size=self.update_rect, pos=self.update_rect)
-        linegraph={
-            "tehran":["red","blue","lightblue","yellow","green","pink","purple"]
+        self.linegraph={
+            "tehran":["red","blue","lightblue","yellow","green","pink","purple",7],
+            "mashhad": ["green","blue","red",2],
+            "isfahan":["red",1],
+            "shiraz":["red","green",2],
+            "tabriz":["lightblue",1],
+            "karaj":["gold","lightblue",2]
         }
         map_layout=FloatLayout( size_hint=(1, 0.8))
         self.lat,self.lon=townLatLon(self.town)
         self.map=MapView(zoom=11, lat=self.lat, lon= self.lon,pos=(0,Window.height*0.1))
-        if (self.town=="tehran"):
-            for i in range(1,8):
-                file_path = os.path.join(script_dir, "tehran"+"\\line"+str(i)+"cords.txt")
-                line = open(file_path,'r')
-                line=line.readlines()
-                for j in range(len(line)):
-                    marker=MapMarker(lat=float(line[j][1:10]),lon=float(line[j][12:19]),source="mapmarker"+linegraph[self.town][i-1]+".png",size=(32,32),anchor_x=0.5,anchor_y=0)
-                    self.map.add_widget(marker)
+        for i in range(1,self.linegraph[self.town][-1]+1):
+            file_path = os.path.join(script_dir, self.town+"\\line"+str(i)+"cords.txt")
+            line = open(file_path,'r')
+            line=line.readlines()
+            for j in range(len(line)):
+                marker=MapMarker(lat=float(line[j][1:10]),lon=float(line[j][12:19]),source="mapmarker"+self.linegraph[self.town][i-1]+".png",size=(32,32),anchor_x=0.5,anchor_y=0)
+                self.map.add_widget(marker)
         
         self.map.map_source="osm"
         map_layout.add_widget(self.map)
         self.add_widget(map_layout)
 
+        self.user_marker = MapMarker(lat=self.lat, lon=self.lon, source="user_marker.png", size=(32, 32), anchor_x=0.5, anchor_y=0.5)
+        self.map.add_widget(self.user_marker)
 
+        with self.user_marker.canvas.before:
+            self.rotation = Rotate()
+            self.rotation.origin = self.user_marker.center
+            self.rotation.angle = 0
 
+        # Start compass (to get orientation)
+        try:
+            compass.enable()
+            Clock.schedule_interval(self.update_compass, 0.1)  # Check compass every 0.1s
+        except NotImplementedError:
+            pass
+
+        try:
+            gps.configure(on_location=self.on_gps_location, on_status=self.on_gps_status)
+            gps.start(minTime=1000, minDistance=1)  # updates every 1 second or 1 meter
+        except NotImplementedError:
+            pass  # GPS not available (e.g., desktop)
 
 
         self.footer = FloatLayout(pos_hint={'x': 0, 'y': 0}, size_hint=(1, 0.1))
@@ -894,6 +916,39 @@ class APIMap(Screen):
         setting_manager.bind(fonthead=self.update_fonthead)
         inside_header.add_widget(self.headerLabel)
         self.add_widget(inside_header)
+
+
+        
+    def on_gps_location(self, **kwargs):
+        # New GPS coordinates
+        new_lat = kwargs['lat']
+        new_lon = kwargs['lon']
+        
+        # Update marker's position
+        self.user_marker.lat = new_lat
+        self.user_marker.lon = new_lon
+        
+        # Create an animation for smooth movement
+        anim = Animation(
+            x=self.map.lon_to_x(new_lon), 
+            y=self.map.lat_to_y(new_lat), 
+            duration=2  # 2 seconds for smooth movement
+        )
+        
+        # Start the animation on the marker
+        anim.start(self.user_marker)
+        
+        # Update the map center on the new position
+        self.map.center_on(new_lat, new_lon)
+
+    def on_gps_status(self, stype, status):
+        pass  # You can ignore GPS status if you want
+
+    def update_compass(self, dt):
+        orientation = compass.orientation
+        if orientation and 'azimuth' in orientation:
+            azimuth = orientation['azimuth']  # degrees
+            self.rotation.angle = -azimuth 
 
     def update_rect(self, *args): 
         self.rect.pos = (0, self.height * 0.9) # Adjust position to be 90% down the screen 
