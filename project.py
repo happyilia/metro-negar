@@ -1400,10 +1400,24 @@ class LineWin(Screen):
             self.popup=Popup(title=fa(txt),size_hint=(1,0.2),pos_hint={'center_x':0.5,'center_y':0.5})
             self.popup.open()
         else:
-            self.popup=Popup(title=fa("زمانبندی حرکت قطار ها"),size_hint=(1,0.6),pos_hint={'center_x':0.5,'center_y':0.5})
-            self.popup.add_widget(Image(source=os.path.join(script_dir, self.town+"\\headway_pics\\"+self.adad+".jpg")))
+            self.popup=Popup(title=fa("زمانبندی حرکت قطار ها(ممکن است زمان ها درست نباشند)"),size_hint=(1,0.6),pos_hint={'center_x':0.5,'center_y':0.5})
+            self.Grid=FloatLayout(size_hint=(1,1))
+            self.stencil=StencilView(pos_hint={'center_x':0.5,'center_y':0.5})
+            self.Grid.add_widget(self.stencil)
+            self.scatter=Scatter(do_translation=True,do_rotation=False,size_hint=(1,1),pos_hint={'center_x':0.5,'center_y':0.5},scale_min=1)
+            self.stencil.add_widget(self.scatter)
+            self.imagepop=AsyncImage(source=os.path.join(script_dir, self.town+"\\headway_pics\\"+self.adad+".jpg"))
+            self.scatter.add_widget(self.imagepop)
+            self.bind(size=self.update_img, pos=self.update_img)
+            self.popup.add_widget(self.Grid)
             self.popup.open()
-
+            self.update_img()
+    def update_img(self, *args): 
+        self.Grid.size_hint=(1,1)
+        self.stencil.pos=(0,self.popup.height*0.1)
+        self.scatter.size=(self.popup.width,self.popup.height*1)
+        self.scatter.pos=(0,self.popup.height*0.25)
+        self.imagepop.size=(self.popup.width,self.popup.height*1)
 
 
 
