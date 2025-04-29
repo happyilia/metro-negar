@@ -3,7 +3,6 @@ from imports import *
 
 
 script_dir = os.path.dirname(os.path.abspath(__file__))
-kv = Builder.load_file("my.kv")
 Window.clearcolor = (1, 1, 1, 1)
 tehlinecolors = [(1,0,0,1),(0,0,1,1),(0,0.8,1,1),(1,0.89,0,1),(0,0.5,0,1),(1,0.45,0.85,1),(0.65,0,1,1)]
 theme=(1,1,1,1)
@@ -80,7 +79,7 @@ def dijkstra_with_total_weight(graph, start, end):
 def finder(txt,town):
     
     for i in range(1,townnumlines[town]+1):
-        file_path = os.path.join(script_dir, str(town)+"\\line"+str(i)+".txt")
+        file_path = os.path.join(script_dir, os.path.join(str(town),"line"+str(i)+".txt"))
         linetxt= open(file_path,'r', encoding='utf-8')
         linetxt=linetxt.read()
         linetxt = linetxt.split('\n')
@@ -92,7 +91,7 @@ def finder(txt,town):
 def nearplacesfinder(txt,town):
     
     for i in range(1,townnumlines[town]+1):
-        file_path = os.path.join(script_dir, str(town)+"\\line"+str(i)+"infoplaces.txt")
+        file_path = os.path.join(script_dir, os.path.join(str(town),"line"+str(i)+"infoplaces.txt"))
         linetxt= open(file_path,'r', encoding='utf-8')
         linetxt=linetxt.read()
         linetxt = linetxt.split('\n')
@@ -106,7 +105,7 @@ def nearplacesfinder(txt,town):
 def line_finder(pot,town):
     lines=[]
     for i in range(1,townnumlines[town]+1):
-        file_path = os.path.join(script_dir, str(town)+"\\line"+str(i)+".txt")
+        file_path = os.path.join(script_dir, os.path.join(str(town),"line"+str(i)+".txt"))
         linetxt= open(file_path,'r', encoding='utf-8')
         linetxt=linetxt.read()
         linetxt = linetxt.split('\n')
@@ -149,7 +148,7 @@ tehran_graph={}
 tehran_stations=[]
 o=0
 for i in range(1,8):
-    file_path = os.path.join(script_dir, "tehran\\line"+str(i)+".txt")
+    file_path = os.path.join(script_dir, os.path.join("tehran","line"+str(i)+".txt"))
     linetxt= open(file_path,'r', encoding='utf-8')
     linetxt=linetxt.read()
     linetxt = linetxt.split('\n')
@@ -176,7 +175,7 @@ mashhad_graph={}
 mashhad_stations=[]
 o=0
 for i in range(1,3):
-    file_path = os.path.join(script_dir, "mashhad\\line"+str(i)+".txt")
+    file_path = os.path.join(script_dir, os.path.join("mashhad","line"+str(i)+".txt"))
     linetxt= open(file_path,'r', encoding='utf-8')
     linetxt=linetxt.read()
     linetxt = linetxt.split('\n')
@@ -203,7 +202,7 @@ isfahan_graph={}
 isfahan_stations=[]
 o=0
 for i in range(1,1):
-    file_path = os.path.join(script_dir, "isfahan\\line"+str(i)+".txt")
+    file_path = os.path.join(script_dir, os.path.join("isfahan","line"+str(i)+".txt"))
     linetxt= open(file_path,'r', encoding='utf-8')
     linetxt=linetxt.read()
     linetxt = linetxt.split('\n')
@@ -229,7 +228,7 @@ shiraz_graph={}
 shiraz_stations=[]
 o=0
 for i in range(1,2):
-    file_path = os.path.join(script_dir, "shiraz\\line"+str(i)+".txt")
+    file_path = os.path.join(script_dir, os.path.join("shiraz","line"+str(i)+".txt"))
     linetxt= open(file_path,'r', encoding='utf-8')
     linetxt=linetxt.read()
     linetxt = linetxt.split('\n')
@@ -255,7 +254,7 @@ tabriz_graph={}
 tabriz_stations=[]
 o=0
 for i in range(1,1):
-    file_path = os.path.join(script_dir, "tabriz\\line"+str(i)+".txt")
+    file_path = os.path.join(script_dir, os.path.join("tabriz","line"+str(i)+".txt"))
     linetxt= open(file_path,'r', encoding='utf-8')
     linetxt=linetxt.read()
     linetxt = linetxt.split('\n')
@@ -281,7 +280,7 @@ karaj_graph={}
 karaj_stations=[]
 o=0
 for i in range(1,1):
-    file_path = os.path.join(script_dir, "karaj\\line"+str(i)+".txt")
+    file_path = os.path.join(script_dir, os.path.join("karaj","line"+str(i)+".txt"))
     linetxt= open(file_path,'r', encoding='utf-8')
     linetxt=linetxt.read()
     linetxt = linetxt.split('\n')
@@ -481,7 +480,7 @@ class LinesPage(Screen):
                 xlabel=0.8
             else:
                 xlabel=0.3
-            file_path = os.path.join(script_dir, str(self.town)+"\\line"+str(j)+".txt")
+            file_path = os.path.join(script_dir, os.path.join(str(self.town),"line"+str(j)+".txt"))
             linetxt= open(file_path,'r', encoding='utf-8')
             self.linelabel = Label(text=fa("خط "+str(j)),font_size = 40, font_name=setting_manager.fonthead ,color=setting_manager.color,pos_hint = {'center_x':xlabel , 'y':i-0.45})
             self.linelabels1.append(self.linelabel)
@@ -839,28 +838,28 @@ class APIMap(Screen):
             self.rect2 = Rectangle()
         
         self.bind(size=self.update_rect, pos=self.update_rect)
-        linegraph={
-            "tehran":["red","blue","lightblue","yellow","green","pink","purple"]
+        self.linegraph={
+            "tehran":["red","blue","lightblue","yellow","green","pink","purple",7],
+            "mashhad": ["green","blue","red",2],
+            "isfahan":["red",1],
+            "shiraz":["red","green",2],
+            "tabriz":["lightblue",1],
+            "karaj":["gold","lightblue",2]
         }
         map_layout=FloatLayout( size_hint=(1, 0.8))
         self.lat,self.lon=townLatLon(self.town)
         self.map=MapView(zoom=11, lat=self.lat, lon= self.lon,pos=(0,Window.height*0.1))
-        if (self.town=="tehran"):
-            for i in range(1,8):
-                file_path = os.path.join(script_dir, "tehran"+"\\line"+str(i)+"cords.txt")
-                line = open(file_path,'r')
-                line=line.readlines()
-                for j in range(len(line)):
-                    marker=MapMarker(lat=float(line[j][1:10]),lon=float(line[j][12:19]),source="mapmarker"+linegraph[self.town][i-1]+".png",size=(32,32),anchor_x=0.5,anchor_y=0)
-                    self.map.add_widget(marker)
+        for i in range(1,self.linegraph[self.town][-1]+1):
+            file_path = os.path.join(script_dir, os.path.join(self.town,"line"+str(i)+"cords.txt"))
+            line = open(file_path,'r')
+            line=line.readlines()
+            for j in range(len(line)):
+                marker=MapMarker(lat=float(line[j][1:10]),lon=float(line[j][12:19]),source="mapmarker"+self.linegraph[self.town][i-1]+".png",size=(32,32),anchor_x=0.5,anchor_y=0)
+                self.map.add_widget(marker)
         
         self.map.map_source="osm"
         map_layout.add_widget(self.map)
         self.add_widget(map_layout)
-
-
-
-
 
         self.footer = FloatLayout(pos_hint={'x': 0, 'y': 0}, size_hint=(1, 0.1))
         
@@ -895,6 +894,9 @@ class APIMap(Screen):
         inside_header.add_widget(self.headerLabel)
         self.add_widget(inside_header)
 
+
+
+
     def update_rect(self, *args): 
         self.rect.pos = (0, self.height * 0.9) # Adjust position to be 90% down the screen 
         self.rect.size = (self.width, self.height * 0.1)
@@ -923,7 +925,7 @@ class Map(Screen):
     def on_kv_post(self, base_widget):
         
         
-        file_path = os.path.join(script_dir, self.town+"\\map"+setting_manager.icon+".png")
+        file_path = os.path.join(script_dir, os.path.join(self.town,"map"+setting_manager.icon+".png"))
         self.Grid=FloatLayout(size_hint=(1,.8))
         self.add_widget(self.Grid)
         self.stencil=StencilView(pos=(0,Window.height*0.1))
@@ -979,7 +981,7 @@ class Map(Screen):
         setting_manager.bind(icon=self.update_icon)
 
     def update_icon(self, instance, value):
-        self.image.source = os.path.join(script_dir, self.town+"\\map"+value+".png")
+        self.image.source = os.path.join(script_dir, os.path.join(self.town,"map"+value+".png"))
     def update_theme(self, instance, value):
         self.headerLabel.color = value
     def update_fonthead(self, instance, value):
@@ -1111,7 +1113,7 @@ class Nav(Screen):
             adads=line_finder(path,self.town)
             
             
-            screens.append(LineWin(name="search", esm=self.town+"\\line" + str(1) + ".txt", adad=adads,rang=(1,1,1,1), t=True,stations=path,town=self.town))
+            screens.append(LineWin(name="search", esm=os.path.join(self.town,"line" + str(1) + ".txt"), adad=adads,rang=(1,1,1,1), t=True,stations=path,town=self.town))
 
             sm.add_widget(screens[len(screens)-1])
             sm.current="search"
@@ -1131,7 +1133,7 @@ class LineWin(Screen):
             besamt=[]
             start=0
             for i in range(1,townnumlines[self.town]+1):
-                file_path = os.path.join(script_dir,self.town+"\\line"+str(i)+".txt")
+                file_path = os.path.join(script_dir,os.path.join(self.town,"line"+str(i)+".txt"))
                 linetxt= open(file_path,'r', encoding='utf-8')
                 linetxt=linetxt.read()
                 linetxt = linetxt.split('\n')
@@ -1161,7 +1163,7 @@ class LineWin(Screen):
         self.bind(size=self.update_rect, pos=self.update_rect)
         self.StationBtns=[]
         r=0
-        file_path_intersecs = os.path.join(script_dir, self.town+"\\intersections.txt")
+        file_path_intersecs = os.path.join(script_dir, os.path.join(self.town,"intersections.txt"))
         open_intersecs=open(file_path_intersecs,'r',encoding='utf-8')
         intersecs=open_intersecs.read().split('\n')
         k=0
@@ -1170,7 +1172,7 @@ class LineWin(Screen):
         for i in lines:
             if i in intersecs :
                 
-                self.StationBtns.append(MDIconButton(rounded_button=False,icon=os.path.join(script_dir, self.town+"\\intersecs_pics\\"+str(setting_manager.colorhead)+" ("+str(intersecs.index(i)+1)+").png"),pos_hint={'center_x':0.7},icon_size="42sp"))
+                self.StationBtns.append(MDIconButton(rounded_button=False,icon=os.path.join(script_dir, os.path.join(self.town,os.path.join("intersecs_pics",str(setting_manager.colorhead)+" ("+str(intersecs.index(i)+1)+").png"))),pos_hint={'center_x':0.7},icon_size="42sp"))
                 self.StationBtns[-1].pos_hint = {'center_x': 0.505, 'center_y': 0.5}
                 self.inters.append(i)
                 
@@ -1345,10 +1347,24 @@ class LineWin(Screen):
             self.popup=Popup(title=fa(txt),size_hint=(1,0.2),pos_hint={'center_x':0.5,'center_y':0.5})
             self.popup.open()
         else:
-            self.popup=Popup(title=fa("زمانبندی حرکت قطار ها"),size_hint=(1,0.6),pos_hint={'center_x':0.5,'center_y':0.5})
-            self.popup.add_widget(Image(source=os.path.join(script_dir, self.town+"\\headway_pics\\"+self.adad+".jpg")))
+            self.popup=Popup(title=fa("زمانبندی حرکت قطار ها(ممکن است زمان ها درست نباشند)"),size_hint=(1,0.6),pos_hint={'center_x':0.5,'center_y':0.5})
+            self.Grid=FloatLayout(size_hint=(1,1))
+            self.stencil=StencilView(pos_hint={'center_x':0.5,'center_y':0.5})
+            self.Grid.add_widget(self.stencil)
+            self.scatter=Scatter(do_translation=True,do_rotation=False,size_hint=(1,1),pos_hint={'center_x':0.5,'center_y':0.5},scale_min=1)
+            self.stencil.add_widget(self.scatter)
+            self.imagepop=AsyncImage(source=os.path.join(script_dir, os.path.join(self.town,os.path.join("headway_pics",self.adad+".jpg"))))
+            self.scatter.add_widget(self.imagepop)
+            self.bind(size=self.update_img, pos=self.update_img)
+            self.popup.add_widget(self.Grid)
             self.popup.open()
-
+            self.update_img()
+    def update_img(self, *args): 
+        self.Grid.size_hint=(1,1)
+        self.stencil.pos=(0,self.popup.height*0.1)
+        self.scatter.size=(self.popup.width,self.popup.height*1)
+        self.scatter.pos=(0,self.popup.height*0.25)
+        self.imagepop.size=(self.popup.width,self.popup.height*1)
 
 
 
@@ -1460,17 +1476,17 @@ class MyApp(MDApp):
         # Adding LineWin screens
         for j in (7,3,1,2,1,2):
             for i in (range(1, j+1)):
-                screens.append(LineWin(name=towns[t]+"line" + str(i), esm=towns[t]+"\\line" + str(i) + ".txt", adad=str(i), rang=towncolors[t+1][i - 1],t=False,stations=[],town=towns[t]))
+                screens.append(LineWin(name=towns[t]+"line" + str(i), esm=os.path.join(towns[t],"line" + str(i) + ".txt"), adad=str(i), rang=towncolors[t+1][i - 1],t=False,stations=[],town=towns[t]))
             t+=1
             
         # Adding StationWin screens
         t=0
         for k in (7,3,1,2,1,2):
             for i in range(1, k+1):
-                line = open(os.path.join(script_dir, towns[t]+"\\line" + str(i) + ".txt"), "r", encoding='utf-8')
+                line = open(os.path.join(script_dir, os.path.join(towns[t],"line" + str(i) + ".txt")), "r", encoding='utf-8')
                 lines = line.readlines()
                 for j in range(1, len(lines) + 1):
-                    screens.append(StationWin(name=str(i) + ',' + str(j)+towns[t], nam=i, adad=j, rang=towncolors[t+1][i - 1], esm=towns[t]+"\\line" + str(i) + "info.txt",town=towns[t]))
+                    screens.append(StationWin(name=str(i) + ',' + str(j)+towns[t], nam=i, adad=j, rang=towncolors[t+1][i - 1], esm=os.path.join(towns[t],"line" + str(i) + "info.txt"),town=towns[t]))
             t+=1
         # Adding other screens
         screens+=[WelcomeWindow(name="welcome"),Setting(name="setting")]

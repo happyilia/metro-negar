@@ -1,0 +1,7 @@
+(35.750901, 51.081741)  #Garmdareh  
+(35.767353, 51.045811)  #Atmosfer  
+(35.786806, 51.002611)  #Karaj  
+(35.802194, 50.964889)  #Mohammadshahr  
+(35.825000, 50.932889)  #Golshahr  
+(35.921500, 50.781800)  #ShahidFakhrizadeh  
+(35.958746, 50.719160)  #ShahidSoleimani
